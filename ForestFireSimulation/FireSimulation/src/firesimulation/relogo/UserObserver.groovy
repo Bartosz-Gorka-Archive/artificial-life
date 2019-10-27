@@ -11,11 +11,11 @@ import firesimulation.ReLogoObserver;
 
 class UserObserver extends ReLogoObserver{
 	def density = 0.5 // TODO move it to project variables
-	
+
 	@Setup
 	def setup(){
 		clearAll()
-		
+
 		ask(patches()) {
 			// Set empty space or tree
 			if(Math.random() <= density) {
@@ -24,7 +24,7 @@ class UserObserver extends ReLogoObserver{
 				it.setPcolor(black())
 			}
 		}
-		
+
 		// Set fire on left side
 		(getMinPycor()..getMaxPycor()).forEach({
 			patch(getMinPxcor(), it).setPcolor(red())
@@ -35,7 +35,7 @@ class UserObserver extends ReLogoObserver{
 	def go(){
 		ask(patches()) {
 			def isTree = it.getPcolor() == green()
-			
+
 			for(neighbor in it.neighbors()) {
 				if (isTree && neighbor.getPcolor() == red()) {
 					it.setPcolor(red())
