@@ -31,18 +31,18 @@ class UserObserver extends ReLogoObserver{
 		})
 	}
 
-	/**
-	 * Add observer methods here. For example:
-
-		@Go
-		def go(){
-			ask(turtles()){
-				left(random(90))
-				right(random(90))
-				forward(random(10))
+	@Go
+	def go(){
+		ask(patches()) {
+			def isTree = it.getPcolor() == green()
+			
+			for(neighbor in it.neighbors()) {
+				if (isTree && neighbor.getPcolor() == red()) {
+					it.setPcolor(red())
+					break;
+				}
 			}
 		}
-
-	 */
-
+		sleep(1000)
+	}
 }
