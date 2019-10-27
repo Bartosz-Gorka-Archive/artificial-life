@@ -10,22 +10,30 @@ import repast.simphony.relogo.schedule.Setup;
 import firesimulation.ReLogoObserver;
 
 class UserObserver extends ReLogoObserver{
+	def density = 0.5 // TODO move it to project variables
+	
+	@Setup
+	def setup(){
+		clearAll()
+		
+		ask(patches()) {
+			// Set empty space or tree
+			if(Math.random() <= density) {
+				it.setPcolor(green())
+			} else {
+				it.setPcolor(black())
+			}
+		}
+		
+		// Set fire on left side
+		(getMinPycor()..getMaxPycor()).forEach({
+			patch(getMinPxcor(), it).setPcolor(red())
+		})
+	}
 
 	/**
 	 * Add observer methods here. For example:
 
-		@Setup
-		def setup(){
-			clearAll()
-			createTurtles(10){
-				forward(random(10))
-			}
-		}
-		
-	 *
-	 * or
-	 * 	
-	
 		@Go
 		def go(){
 			ask(turtles()){
