@@ -215,6 +215,27 @@ public class ReLogoTurtle extends BaseTurtle{
 	}
 
 	/**
+	 * Returns the value from the getDensity() method of the underlying patch.
+	 * 
+	 * @return getDensity() of type java.lang.Object
+	 */
+	@ReLogoBuilderGeneratedFor("firesimulation.relogo.UserPatch")
+	public java.lang.Object getDensity(){
+		firesimulation.relogo.UserPatch p = (firesimulation.relogo.UserPatch)patchHere();
+		return p.getDensity();
+	}
+
+	/**
+	 * Calls the setDensity(java.lang.Object) method of the underlying patch.
+	 * 
+	 */
+	@ReLogoBuilderGeneratedFor("firesimulation.relogo.UserPatch")
+	public void setDensity(java.lang.Object value){
+		firesimulation.relogo.UserPatch p = (firesimulation.relogo.UserPatch)patchHere();
+		p.setDensity(value);
+	}
+
+	/**
 	 * Makes a directed userLink from a turtle to the caller then executes a set of
 	 * commands on the created userLink.
 	 * 
