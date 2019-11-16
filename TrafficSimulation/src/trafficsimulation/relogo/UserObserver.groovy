@@ -12,10 +12,10 @@ import trafficsimulation.ReLogoObserver;
 class UserObserver extends ReLogoObserver{
 	// How many patches we will ignore when build map
 	int notUsedPatches = 2
-	// Draw special bus road?
-	boolean useBusRoad = false
-	int roadsHorizontally = 4
-	int roadsVertically = 3
+	int howManyBusRoads = 1
+	int roadsHorizontally = 2
+	int roadsVertically = 2
+	int howWidthRoads = 3
 	
 	@Setup
 	def setup(){
@@ -50,76 +50,92 @@ class UserObserver extends ReLogoObserver{
 		// How many points we can use
 		int wordSizeX = abs(getMinPxcor()) + getMaxPxcor() - 2 * notUsedPatches
 		int wordSizeY = abs(getMinPycor()) + getMaxPycor() - 2 * notUsedPatches
-		int skipX = (wordSizeX - (2 * 2 * roadsVertically)) / (roadsVertically + 1)
-		int skipY = (wordSizeY - (2 * 2 * roadsHorizontally)) / (roadsHorizontally + 1)
-		
-		// Set all patches to green
-		ask(patches()) {
-			pcolor = green()
-		}
+		int skipX = (wordSizeX - (2 * howWidthRoads * roadsVertically)) / (roadsVertically + 1)
+		int skipY = (wordSizeY - (2 * howWidthRoads * roadsHorizontally)) / (roadsHorizontally + 1)
 		
 		// Horizontally roads
 		for(int roundNumber = 1; roundNumber <= roadsHorizontally; roundNumber++) {
-			int rowIndex =  getMinPycor()  + roundNumber * skipY + roundNumber * 4 - 1
+			int rowIndex =  getMinPycor() + (roundNumber * skipY) + (roundNumber * 2 * howWidthRoads) - 1
 			
 			for (int i = getMinPxcor(); i <= getMaxPxcor(); i++) {
-				if (useBusRoad) {
-					markAsBusRoad(patch(i, rowIndex))
-					markAsBusRoad(patch(i, rowIndex + 3))
-				} else {
-					markAsNormalRoad(patch(i, rowIndex))
-					markAsNormalRoad(patch(i, rowIndex + 3))
+				for (int roadNo = 0; roadNo < howWidthRoads; roadNo++) {
+					if (roadNo < howManyBusRoads) {
+						markAsBusRoad(patch(i, rowIndex + roadNo))
+					} else {
+						markAsNormalRoad(patch(i, rowIndex + roadNo))
+					}
 				}
-				markAsNormalRoad(patch(i, rowIndex + 1))
-				markAsNormalRoad(patch(i, rowIndex + 2))
+				
+				for (int roadNo = 0; roadNo < howWidthRoads; roadNo++) {
+					if (roadNo < (howWidthRoads - howManyBusRoads)) {
+						markAsNormalRoad(patch(i, rowIndex + howWidthRoads + roadNo))
+					} else {
+						markAsBusRoad(patch(i, rowIndex + howWidthRoads + roadNo))
+					}
+				}
 			}
 		}
 		
 		// Vertically roads
 		for(int roundNumber = 1; roundNumber <= roadsVertically; roundNumber++) {
-			int rowIndex =  getMinPxcor()  + roundNumber * skipX + roundNumber * 4 - 1
+			int rowIndex =  getMinPxcor() + (roundNumber * skipX) + (roundNumber * 2 * howWidthRoads) - 1
 			
 			for (int i = getMinPycor(); i <= getMaxPycor(); i++) {
-				if (useBusRoad) {
-					markAsBusRoad(patch(rowIndex, i))
-					markAsBusRoad(patch(rowIndex + 3, i))
-				} else {
-					markAsNormalRoad(patch(rowIndex, i))
-					markAsNormalRoad(patch(rowIndex + 3, i))
+				for (int roadNo = 0; roadNo < howWidthRoads; roadNo++) {
+					if (roadNo < howManyBusRoads) {
+						markAsBusRoad(patch(rowIndex + roadNo, i))
+					} else {
+						markAsNormalRoad(patch(rowIndex + roadNo, i))
+					}
 				}
-				markAsNormalRoad(patch(rowIndex + 1, i))
-				markAsNormalRoad(patch(rowIndex + 2, i))
+				
+				for (int roadNo = 0; roadNo < howWidthRoads; roadNo++) {
+					if (roadNo < (howWidthRoads - howManyBusRoads)) {
+						markAsNormalRoad(patch(rowIndex + howWidthRoads + roadNo, i))
+					} else {
+						markAsBusRoad(patch(rowIndex + howWidthRoads + roadNo, i))
+					}
+				}
 			}
 		}
-		
+				
 		// Footpath or green lawn
 		ask(patches()) {
-			if (it.roadType != RoadType.SPECIAL && it.roadType != RoadType.NORMAL) {
-				// Check is footpath?
+			if (!it.patchType) {
 				boolean footpath = false
 				ask(neighbors4()) {
-					if (it.roadType == RoadType.SPECIAL || it.roadType == RoadType.NORMAL)
+					if (it.patchType == PatchType.ROAD_SPECIAL || it.patchType == PatchType.ROAD_NORMAL)
 						footpath = true
 				}
 				
 				// Draw footpath or green lawn
 				if (footpath) {
-					pcolor = black()
+					markAsFootPath(it)
 				} else {
-					pcolor = green()
+					markAsEmptySpace(it)
 				}
 			}
 		}
 	}
 	
+	def markAsEmptySpace(UserPatch patch) {
+		patch.patchType = PatchType.EMPTY_SPACE
+		patch.pcolor = green()
+	}
+	
+	def markAsFootPath(UserPatch patch) {
+		patch.patchType = PatchType.FOOTPATH
+		patch.pcolor = black()
+	}
+	
 	def markAsBusRoad(UserPatch patch) {
-		patch.roadType = RoadType.SPECIAL
+		patch.patchType = PatchType.ROAD_SPECIAL
 		patch.pcolor = white()
 	}
 	
 	def markAsNormalRoad(UserPatch patch) {
-		patch.roadType = RoadType.NORMAL
-		patch.pcolor = 9.5d
+		patch.patchType = PatchType.ROAD_NORMAL
+		patch.pcolor = 9.2d
 	}
 	
 	def markAsBus(UserTurtle turtle) {

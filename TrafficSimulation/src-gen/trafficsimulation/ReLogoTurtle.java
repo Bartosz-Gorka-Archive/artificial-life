@@ -215,24 +215,24 @@ public class ReLogoTurtle extends BaseTurtle{
 	}
 
 	/**
-	 * Returns the value from the getRoadType() method of the underlying patch.
+	 * Returns the value from the getPatchType() method of the underlying patch.
 	 * 
-	 * @return getRoadType() of type trafficsimulation.relogo.RoadType
+	 * @return getPatchType() of type trafficsimulation.relogo.PatchType
 	 */
 	@ReLogoBuilderGeneratedFor("trafficsimulation.relogo.UserPatch")
-	public trafficsimulation.relogo.RoadType getRoadType(){
+	public trafficsimulation.relogo.PatchType getPatchType(){
 		trafficsimulation.relogo.UserPatch p = (trafficsimulation.relogo.UserPatch)patchHere();
-		return p.getRoadType();
+		return p.getPatchType();
 	}
 
 	/**
-	 * Calls the setRoadType(trafficsimulation.relogo.RoadType) method of the underlying patch.
+	 * Calls the setPatchType(trafficsimulation.relogo.PatchType) method of the underlying patch.
 	 * 
 	 */
 	@ReLogoBuilderGeneratedFor("trafficsimulation.relogo.UserPatch")
-	public void setRoadType(trafficsimulation.relogo.RoadType value){
+	public void setPatchType(trafficsimulation.relogo.PatchType value){
 		trafficsimulation.relogo.UserPatch p = (trafficsimulation.relogo.UserPatch)patchHere();
-		p.setRoadType(value);
+		p.setPatchType(value);
 	}
 
 	/**
