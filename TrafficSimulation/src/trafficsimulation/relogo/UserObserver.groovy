@@ -61,7 +61,6 @@ class UserObserver extends ReLogoObserver{
 		// Horizontally roads
 		for(int roundNumber = 1; roundNumber <= roadsHorizontally; roundNumber++) {
 			int rowIndex =  getMinPycor()  + roundNumber * skipY + roundNumber * 4 - 1
-			System.out.println(rowIndex)
 			
 			for (int i = getMinPxcor(); i <= getMaxPxcor(); i++) {
 				if (useBusRoad) {
@@ -90,6 +89,25 @@ class UserObserver extends ReLogoObserver{
 				}
 				markAsNormalRoad(patch(rowIndex + 1, i))
 				markAsNormalRoad(patch(rowIndex + 2, i))
+			}
+		}
+		
+		// Footpath or green lawn
+		ask(patches()) {
+			if (it.roadType != RoadType.SPECIAL && it.roadType != RoadType.NORMAL) {
+				// Check is footpath?
+				boolean footpath = false
+				ask(neighbors4()) {
+					if (it.roadType == RoadType.SPECIAL || it.roadType == RoadType.NORMAL)
+						footpath = true
+				}
+				
+				// Draw footpath or green lawn
+				if (footpath) {
+					pcolor = black()
+				} else {
+					pcolor = green()
+				}
 			}
 		}
 	}
