@@ -215,6 +215,27 @@ public class ReLogoTurtle extends BaseTurtle{
 	}
 
 	/**
+	 * Returns the value from the getRoadType() method of the underlying patch.
+	 * 
+	 * @return getRoadType() of type trafficsimulation.relogo.RoadType
+	 */
+	@ReLogoBuilderGeneratedFor("trafficsimulation.relogo.UserPatch")
+	public trafficsimulation.relogo.RoadType getRoadType(){
+		trafficsimulation.relogo.UserPatch p = (trafficsimulation.relogo.UserPatch)patchHere();
+		return p.getRoadType();
+	}
+
+	/**
+	 * Calls the setRoadType(trafficsimulation.relogo.RoadType) method of the underlying patch.
+	 * 
+	 */
+	@ReLogoBuilderGeneratedFor("trafficsimulation.relogo.UserPatch")
+	public void setRoadType(trafficsimulation.relogo.RoadType value){
+		trafficsimulation.relogo.UserPatch p = (trafficsimulation.relogo.UserPatch)patchHere();
+		p.setRoadType(value);
+	}
+
+	/**
 	 * Makes a directed userLink from a turtle to the caller then executes a set of
 	 * commands on the created userLink.
 	 * 
