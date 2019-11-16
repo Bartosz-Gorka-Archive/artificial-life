@@ -10,22 +10,24 @@ import repast.simphony.relogo.schedule.Setup;
 import trafficsimulation.ReLogoObserver;
 
 class UserObserver extends ReLogoObserver{
-
-	/**
-	 * Add observer methods here. For example:
-
-		@Setup
-		def setup(){
-			clearAll()
-			createTurtles(10){
-				forward(random(10))
-			}
-		}
+	@Setup
+	def setup(){
+		// Clear environment
+		clearAll()
 		
-	 *
-	 * or
-	 * 	
-	
+		createTurtles(10) {
+			setxy(randomXcor(), randomYcor())
+			if (Math.random() >= 0.5) {
+				vehicleType = VehicleType.BUS
+				setShape("truck")
+			} else {
+				vehicleType = VehicleType.CAR
+				setShape("car")
+			}	
+		}
+	}
+		
+	 /**
 		@Go
 		def go(){
 			ask(turtles()){

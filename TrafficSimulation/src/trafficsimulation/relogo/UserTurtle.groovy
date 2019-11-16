@@ -11,5 +11,5 @@ import repast.simphony.relogo.schedule.Setup;
 import trafficsimulation.ReLogoTurtle;
 
 class UserTurtle extends ReLogoTurtle{
-
+	VehicleType vehicleType
 }
