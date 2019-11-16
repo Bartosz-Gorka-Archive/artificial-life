@@ -18,11 +18,9 @@ class UserObserver extends ReLogoObserver{
 		createTurtles(10) {
 			setxy(randomXcor(), randomYcor())
 			if (Math.random() >= 0.5) {
-				vehicleType = VehicleType.BUS
-				setShape("truck")
+				markAsBus(it)
 			} else {
-				vehicleType = VehicleType.CAR
-				setShape("car")
+				markAsCar(it)
 			}	
 		}
 	}
@@ -38,5 +36,14 @@ class UserObserver extends ReLogoObserver{
 		}
 
 	 */
-
+	
+	def markAsBus(turtle) {
+		turtle.vehicleType = VehicleType.BUS
+		turtle.setShape("truck")
+	}
+	
+	def markAsCar(turtle) {
+		turtle.vehicleType = VehicleType.CAR
+		turtle.setShape("car")
+	}
 }
