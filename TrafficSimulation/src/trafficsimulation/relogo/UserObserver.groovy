@@ -18,6 +18,7 @@ class UserObserver extends ReLogoObserver{
 	int howWidthRoads = 2
 	int howManyCrossingWithLights = 1
 	int howManyCrossingCircles = 3
+	int lightTimerTicks = 10
 	boolean usePedestrians = true
 	HashSet<UserPatch> patchesCrossing = new HashSet<>()
 	HashSet<Crossing> crossings = new HashSet<>()
@@ -153,7 +154,6 @@ class UserObserver extends ReLogoObserver{
 			// Check if one of my neighbors already with crossing
 			for (UserPatch neighbor in patch.neighbors4()) {
 				if (neighbor.crossing != null) {
-					System.out.println(neighbor.getPxcor() + " " + neighbor.getPycor() + " With reference")
 					patch.crossing = neighbor.crossing
 					break
 				}
@@ -175,6 +175,7 @@ class UserObserver extends ReLogoObserver{
 		for(Crossing crossing in crossings) {
 			if (crossingNo < howManyCrossingWithLights) {
 				crossing.crossType = CrossType.TRAFFIC_WITH_LIGHTS
+				crossing.lights = new TrafficLight(lightTimerTicks)
 			} else {
 				crossing.crossType = CrossType.TRAFFIC_CIRCLE
 			}
