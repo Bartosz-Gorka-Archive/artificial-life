@@ -11,11 +11,13 @@ import trafficsimulation.ReLogoObserver;
 
 class UserObserver extends ReLogoObserver{
 	// How many patches we will ignore when build map
-	int notUsedPatches = 2
+	int notUsedPatches = 0
 	int howManyBusRoads = 1
 	int roadsHorizontally = 2
 	int roadsVertically = 2
-	int howWidthRoads = 3
+	int howWidthRoads = 2
+	boolean usePedestrians = true
+	HashSet<UserPatch> patchesCrossing = new HashSet<>()
 	
 	@Setup
 	def setup(){
@@ -24,6 +26,11 @@ class UserObserver extends ReLogoObserver{
 		
 		// Prepare roads
 		setRoadsOnMap()
+		
+		// Draw zebra crossing
+		if (usePedestrians) {
+			drawZebraCrossing()
+		}
 		
 		createTurtles(10) {
 			setxy(randomXcor(), randomYcor())
@@ -46,6 +53,11 @@ class UserObserver extends ReLogoObserver{
 		}
 
 	 */
+	
+	def drawZebraCrossing() {
+		
+	}
+
 	def setRoadsOnMap() {
 		// How many points we can use
 		int wordSizeX = abs(getMinPxcor()) + getMaxPxcor() - 2 * notUsedPatches
@@ -82,18 +94,28 @@ class UserObserver extends ReLogoObserver{
 			
 			for (int i = getMinPycor(); i <= getMaxPycor(); i++) {
 				for (int roadNo = 0; roadNo < howWidthRoads; roadNo++) {
-					if (roadNo < howManyBusRoads) {
-						markAsBusRoad(patch(rowIndex + roadNo, i))
+					// If already set patch type - we have crossing now
+					if (patch(rowIndex + roadNo, i).patchType) {
+						markAsCrossing(patch(rowIndex + roadNo, i))
 					} else {
-						markAsNormalRoad(patch(rowIndex + roadNo, i))
+						if (roadNo < howManyBusRoads) {
+							markAsBusRoad(patch(rowIndex + roadNo, i))
+						} else {
+							markAsNormalRoad(patch(rowIndex + roadNo, i))
+						}
 					}
 				}
 				
 				for (int roadNo = 0; roadNo < howWidthRoads; roadNo++) {
-					if (roadNo < (howWidthRoads - howManyBusRoads)) {
-						markAsNormalRoad(patch(rowIndex + howWidthRoads + roadNo, i))
+					// If already set patch type - we have crossing now
+					if (patch(rowIndex + howWidthRoads + roadNo, i).patchType) {
+						markAsCrossing(patch(rowIndex + howWidthRoads + roadNo, i))
 					} else {
-						markAsBusRoad(patch(rowIndex + howWidthRoads + roadNo, i))
+						if (roadNo < (howWidthRoads - howManyBusRoads)) {
+							markAsNormalRoad(patch(rowIndex + howWidthRoads + roadNo, i))
+						} else {
+							markAsBusRoad(patch(rowIndex + howWidthRoads + roadNo, i))
+						}
 					}
 				}
 			}
@@ -116,6 +138,14 @@ class UserObserver extends ReLogoObserver{
 				}
 			}
 		}
+		
+		// TODO group patches from patchesCrossing set into crossingObject
+	}
+	
+	def markAsCrossing(UserPatch patch) {
+		patch.patchType = PatchType.CROSSING;
+		patch.pcolor = 28.9d
+		patchesCrossing.add(patch)
 	}
 	
 	def markAsEmptySpace(UserPatch patch) {
