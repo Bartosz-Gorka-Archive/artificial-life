@@ -16,6 +16,8 @@ class UserObserver extends ReLogoObserver{
 	int roadsHorizontally = 2
 	int roadsVertically = 2
 	int howWidthRoads = 2
+	int howManyCrossingWithLights = 1
+	int howManyCrossingCircles = 3
 	boolean usePedestrians = true
 	HashSet<UserPatch> patchesCrossing = new HashSet<>()
 	HashSet<Crossing> crossings = new HashSet<>()
@@ -166,6 +168,17 @@ class UserObserver extends ReLogoObserver{
 			
 			// Add patch to the crossing
 			patch.crossing.patches.add(patch)
+		}
+		
+		// Set type of crossing
+		int crossingNo = 0
+		for(Crossing crossing in crossings) {
+			if (crossingNo < howManyCrossingWithLights) {
+				crossing.crossType = CrossType.TRAFFIC_WITH_LIGHTS
+			} else {
+				crossing.crossType = CrossType.TRAFFIC_CIRCLE
+			}
+			crossingNo++
 		}
 	}
 	
