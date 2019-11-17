@@ -12,4 +12,5 @@ import trafficsimulation.ReLogoTurtle;
 
 class UserTurtle extends ReLogoTurtle{
 	VehicleType vehicleType
+	int passengersCount
 }

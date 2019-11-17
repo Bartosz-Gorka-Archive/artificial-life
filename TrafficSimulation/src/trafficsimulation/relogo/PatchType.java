@@ -5,5 +5,6 @@ public enum PatchType {
 	ROAD_SPECIAL,
 	FOOTPATH,
 	CROSSING,
+	ZEBRA,
 	EMPTY_SPACE;
 }

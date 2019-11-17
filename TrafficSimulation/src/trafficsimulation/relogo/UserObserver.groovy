@@ -22,6 +22,8 @@ class UserObserver extends ReLogoObserver{
 	boolean usePedestrians = true
 	HashSet<UserPatch> patchesCrossing = new HashSet<>()
 	HashSet<Crossing> crossings = new HashSet<>()
+	HashSet<Integer> notAllowedX = new HashSet<>()
+	HashSet<Integer> notAllowedY = new HashSet<>()
 	
 	@Setup
 	def setup(){
@@ -59,7 +61,65 @@ class UserObserver extends ReLogoObserver{
 	 */
 	
 	def drawZebraCrossing() {
+		for(int i = 0; i < 4; i++) {
+			notAllowedX.add(getMaxPxcor() - i)
+			notAllowedX.add(getMinPxcor() + i)
+			notAllowedY.add(getMaxPycor() - i)
+			notAllowedY.add(getMinPycor() + i)
+		}
 		
+		HashSet<Integer> allowedX = new HashSet<>()
+		HashSet<Integer> allowedY = new HashSet<>()
+		for (int i = getMinPxcor(); i <= getMaxPxcor(); i++) {
+			if(!notAllowedX.contains(new Integer(i)))
+				allowedX.add(i)
+		}
+		for (int i = getMinPycor(); i <= getMaxPycor(); i++) {
+			if(!notAllowedY.contains(new Integer(i)))
+				allowedY.add(i)
+		}
+		
+		for (int i = 0; i < 2 * roadsVertically; i++) {
+			if (allowedX.iterator().hasNext()) {
+				Integer xRef = allowedX.iterator().next()
+				
+				for (int y = getMinPycor(); y <= getMaxPycor(); y++) {
+					UserPatch p = patch(xRef, y)
+					if (p.patchType == PatchType.FOOTPATH || p.patchType == PatchType.ROAD_NORMAL || p.patchType == PatchType.ROAD_SPECIAL) {
+						markAsZebra(p)
+					}
+				}
+				
+				for(int it = 0; it < 5; it++) {
+					allowedX.remove(xRef + it)
+					allowedX.remove(xRef - it)
+				}
+			} else {
+				// No more possibility to prepare zebra paths
+				break
+			}
+		}
+		
+		for (int i = 0; i < 2 * roadsHorizontally; i++) {
+			if (allowedY.iterator().hasNext()) {
+				Integer yRef = allowedY.iterator().next()
+				
+				for (int x = getMinPxcor(); x <= getMaxPxcor(); x++) {
+					UserPatch p = patch(x, yRef)
+					if (p.patchType == PatchType.FOOTPATH || p.patchType == PatchType.ROAD_NORMAL || p.patchType == PatchType.ROAD_SPECIAL) {
+						markAsZebra(p)
+					}
+				}
+				
+				for(int it = 0; it < 5; it++) {
+					allowedY.remove(yRef + it)
+					allowedY.remove(yRef - it)
+				}
+			} else {
+				// No more possibility to prepare zebra paths
+				break
+			}
+		}
 	}
 
 	def setRoadsOnMap() {
@@ -88,6 +148,16 @@ class UserObserver extends ReLogoObserver{
 					} else {
 						markAsBusRoad(patch(i, rowIndex + howWidthRoads + roadNo))
 					}
+				}
+			}
+			
+			
+			for (int roadNo = 0; roadNo < howWidthRoads; roadNo++) {
+				for(int i = 0; i < 5; i++) {
+					notAllowedY.add(rowIndex + roadNo + i)
+					notAllowedY.add(rowIndex + roadNo - i)
+					notAllowedY.add(rowIndex + howWidthRoads + roadNo + i)
+					notAllowedY.add(rowIndex + howWidthRoads + roadNo - i)
 				}
 			}
 		}
@@ -121,6 +191,15 @@ class UserObserver extends ReLogoObserver{
 							markAsBusRoad(patch(rowIndex + howWidthRoads + roadNo, i))
 						}
 					}
+				}
+			}
+			
+			for (int roadNo = 0; roadNo < howWidthRoads; roadNo++) {
+				for(int i = 0; i < 5; i++) {
+					notAllowedX.add(rowIndex + roadNo + i)
+					notAllowedX.add(rowIndex + roadNo - i)
+					notAllowedX.add(rowIndex + howWidthRoads + roadNo + i)
+					notAllowedX.add(rowIndex + howWidthRoads + roadNo - i)
 				}
 			}
 		}
@@ -187,6 +266,11 @@ class UserObserver extends ReLogoObserver{
 		patch.patchType = PatchType.CROSSING;
 		patch.pcolor = 28.9d
 		patchesCrossing.add(patch)
+	}
+	
+	def markAsZebra(UserPatch patch) {
+		patch.patchType = PatchType.ZEBRA
+		patch.pcolor = yellow()
 	}
 	
 	def markAsEmptySpace(UserPatch patch) {
