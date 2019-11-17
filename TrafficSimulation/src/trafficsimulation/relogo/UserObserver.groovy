@@ -2,6 +2,8 @@ package trafficsimulation.relogo
 
 import static repast.simphony.relogo.Utility.*;
 import static repast.simphony.relogo.UtilityG.*;
+
+import repast.simphony.engine.environment.RunEnvironment
 import repast.simphony.relogo.Stop;
 import repast.simphony.relogo.Utility;
 import repast.simphony.relogo.UtilityG;
@@ -37,28 +39,43 @@ class UserObserver extends ReLogoObserver{
 		if (usePedestrians) {
 			drawZebraCrossing()
 		}
-		
-		createTurtles(10) {
-			setxy(randomXcor(), randomYcor())
-			if (Math.random() >= 0.5) {
-				markAsBus(it)
-			} else {
-				markAsCar(it)
-			}	
-		}
 	}
 		
-	 /**
-		@Go
-		def go(){
-			ask(turtles()){
-				left(random(90))
-				right(random(90))
-				forward(random(10))
+	@Go
+	def go(){
+		if (patch(-6, -24).turtlesHere().size() < 1) {
+			createTurtles(1) { UserTurtle turtle ->
+				// TODO add turtles dynamically in different locations
+				turtle.setxy(-6, -24)
+				
+				// TODO set angle
+				turtle.setHeading(0)
+				
+				// TODO change it to passengers model
+				if (Math.random() >= 0.5) {
+					markAsBus(turtle)
+				} else {
+					markAsCar(turtle)
+				}
+				
+				// TODO dynamic
+				turtle.destinationX = -6
+				turtle.destinationY = 24
 			}
 		}
-
-	 */
+		
+		ask(turtles()) { UserTurtle turtle ->
+			turtle.go()
+		}
+		
+		if (RunEnvironment.getInstance().getCurrentSchedule().getTickCount() % 7 == 0) {
+			ask(patches()) { UserPatch patch ->
+				if (patch.patchType == PatchType.ZEBRA) {
+					patch.pedestianOnZebra = !patch.pedestianOnZebra
+				}
+			}
+		}
+	}
 	
 	def drawZebraCrossing() {
 		for(int i = 0; i < 4; i++) {
@@ -271,6 +288,7 @@ class UserObserver extends ReLogoObserver{
 	def markAsZebra(UserPatch patch) {
 		patch.patchType = PatchType.ZEBRA
 		patch.pcolor = yellow()
+		patch.pedestianOnZebra = false
 	}
 	
 	def markAsEmptySpace(UserPatch patch) {
@@ -296,10 +314,12 @@ class UserObserver extends ReLogoObserver{
 	def markAsBus(UserTurtle turtle) {
 		turtle.vehicleType = VehicleType.BUS
 		turtle.setShape("truck")
+		turtle.setColor(42.0d)
 	}
 	
 	def markAsCar(UserTurtle turtle) {
 		turtle.vehicleType = VehicleType.CAR
 		turtle.setShape("car")
+		turtle.setColor(76.0d)
 	}
 }

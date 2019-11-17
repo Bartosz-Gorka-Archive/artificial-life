@@ -13,4 +13,5 @@ import trafficsimulation.ReLogoPatch;
 class UserPatch extends ReLogoPatch{
 	def PatchType patchType
 	def Crossing crossing
+	def boolean pedestianOnZebra
 }
