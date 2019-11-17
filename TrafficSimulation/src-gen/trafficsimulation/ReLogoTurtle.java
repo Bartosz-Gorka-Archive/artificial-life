@@ -236,6 +236,27 @@ public class ReLogoTurtle extends BaseTurtle{
 	}
 
 	/**
+	 * Returns the value from the getCrossing() method of the underlying patch.
+	 * 
+	 * @return getCrossing() of type trafficsimulation.relogo.Crossing
+	 */
+	@ReLogoBuilderGeneratedFor("trafficsimulation.relogo.UserPatch")
+	public trafficsimulation.relogo.Crossing getCrossing(){
+		trafficsimulation.relogo.UserPatch p = (trafficsimulation.relogo.UserPatch)patchHere();
+		return p.getCrossing();
+	}
+
+	/**
+	 * Calls the setCrossing(trafficsimulation.relogo.Crossing) method of the underlying patch.
+	 * 
+	 */
+	@ReLogoBuilderGeneratedFor("trafficsimulation.relogo.UserPatch")
+	public void setCrossing(trafficsimulation.relogo.Crossing value){
+		trafficsimulation.relogo.UserPatch p = (trafficsimulation.relogo.UserPatch)patchHere();
+		p.setCrossing(value);
+	}
+
+	/**
 	 * Makes a directed userLink from a turtle to the caller then executes a set of
 	 * commands on the created userLink.
 	 * 

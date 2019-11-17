@@ -18,6 +18,7 @@ class UserObserver extends ReLogoObserver{
 	int howWidthRoads = 2
 	boolean usePedestrians = true
 	HashSet<UserPatch> patchesCrossing = new HashSet<>()
+	HashSet<Crossing> crossings = new HashSet<>()
 	
 	@Setup
 	def setup(){
@@ -139,7 +140,33 @@ class UserObserver extends ReLogoObserver{
 			}
 		}
 		
-		// TODO group patches from patchesCrossing set into crossingObject
+		// We need sort patches to use neighbors4/1 method
+		List<UserPatch> list = new ArrayList<>(patchesCrossing); 
+		list.sort { a, b ->
+		   a.getPxcor() <=> b.getPxcor() ?: a.getPycor() <=> b.getPycor()
+		}
+			
+		// Group patches from patchesCrossing set into crossingObject
+		for (UserPatch patch in list) {
+			// Check if one of my neighbors already with crossing
+			for (UserPatch neighbor in patch.neighbors4()) {
+				if (neighbor.crossing != null) {
+					System.out.println(neighbor.getPxcor() + " " + neighbor.getPycor() + " With reference")
+					patch.crossing = neighbor.crossing
+					break
+				}
+			}
+			
+			// Not set - we need prepare new crossing
+			if (patch.crossing == null) {
+				Crossing crossing = new Crossing()
+				crossings.add(crossing)
+				patch.crossing = crossing
+			}
+			
+			// Add patch to the crossing
+			patch.crossing.patches.add(patch)
+		}
 	}
 	
 	def markAsCrossing(UserPatch patch) {
