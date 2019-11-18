@@ -187,7 +187,7 @@ class UserObserver extends ReLogoObserver{
 		for (y = getMinPycor(); y <= getMaxPycor(); y++) {
 			UserPatch p = patch(x, y)
 			if (p.patchType == PatchType.ROAD_NORMAL || p.patchType == PatchType.ROAD_SPECIAL) {
-				if (p.roadNo >= previousRoadNo) {
+				if (p.roadNo <= previousRoadNo) {
 					Location location = new Location()
 					location.destinationLocationPatch = patch(getMinPxcor(), y)
 					location.startLocationPatch = p

@@ -23,61 +23,97 @@ class UserTurtle extends ReLogoTurtle{
 	
 	def go() {
 		if (!this.dieIfAlreadyOnPlace()) {
-			UserPatch patch
+			UserPatch patchUp
+			UserPatch patchLeft
+			UserPatch patchRight
+			
 			switch (this.moveRule) {
 				case ActionRule.UP:
-					patch = patchAt(0, 1)
+					patchUp = patchAt(0, 1)
+					patchLeft = patchAt(-1, 1)
+					patchRight = patchAt(1, 1)
 					break
 					
 				case ActionRule.RIGHT:
-					patch = patchAt(1, 0)
+					patchUp = patchAt(1, 0)
+					patchLeft = patchAt(1, 1)
+					patchRight = patchAt(1, -1)
 					break
 					
 				case ActionRule.DOWN:
-					patch = patchAt(0, -1)
+					patchUp = patchAt(0, -1)
+					patchLeft = patchAt(1, -1)
+					patchRight = patchAt(-1, -1)
 					break
 				
 				case ActionRule.LEFT:
-					patch = patchAt(-1, 0)
+					patchUp = patchAt(-1, 0)
+					patchLeft = patchAt(-1, -1)
+					patchRight = patchAt(-1, 1)
 					break
 			}
 			
 			// Empty?
-			if (patch.turtlesHere().isEmpty()) {
-				switch (patch.patchType) {
+			if (patchUp.turtlesHere().isEmpty()) {
+				switch (patchUp.patchType) {
 					// If zebra crossing - can enter?
 					case PatchType.ZEBRA:
-						if (!patch.pedestianOnZebra) {
+						if (!patchUp.pedestianOnZebra) {
 							forward(1)
 						}
 						break
 						
 					// If crossing
 					case PatchType.CROSSING:
+						// TODO we need be able to move across the street
+						
 						// If crossing with lights
-						if (patch.crossing.crossType == CrossType.TRAFFIC_WITH_LIGHTS) {
-							if ((patch.crossing.lights.rule == this.moveRule || patch.crossing.lights.rule == this.lightExtraRule) && patch.crossing.lights.timer >= this.minLightTimer) {
+						if (patchUp.crossing.crossType == CrossType.TRAFFIC_WITH_LIGHTS) {
+							if ((patchUp.crossing.lights.rule == this.moveRule || patchUp.crossing.lights.rule == this.lightExtraRule) && patchUp.crossing.lights.timer >= this.minLightTimer) {
 								forward(1)
 							} else if (this.patchHere().patchType == PatchType.CROSSING) {
 								// Continue move if already on crossing
 								forward(1)
 							}
-						} else if(patch.crossing.crossType == CrossType.TRAFFIC_CIRCLE) {
+						} else if(patchUp.crossing.crossType == CrossType.TRAFFIC_CIRCLE) {
 							// TODO maybe check left site?
 							forward(1)
 						}
 						break
-					
+						
 					default:
 						forward(1)
 						break
 				}
+			} else if ((patchLeft.patchType == PatchType.ROAD_NORMAL || (
+					patchLeft.patchType == PatchType.ROAD_SPECIAL && this.vehicleType == VehicleType.BUS)
+				) &&  patchLeft.turtlesHere().isEmpty() && (patchLeft.roadNo == this.patchHere().roadNo - 1 || patchLeft.roadNo == this.patchHere().roadNo + 1)) {
+				forward(1)
+				left(90)
+				forward(1)
+				right(90)
+				if (abs(patchLeft.getPxcor() - destinationX) == 1)
+					destinationX = patchLeft.getPxcor()
+				if (abs(patchLeft.getPycor() - destinationY) == 1)
+					destinationY = patchLeft.getPycor()
+					
+			} else if ((patchRight.patchType == PatchType.ROAD_NORMAL || (
+					patchRight.patchType == PatchType.ROAD_SPECIAL && this.vehicleType == VehicleType.BUS)
+				) &&  patchRight.turtlesHere().isEmpty() && (patchRight.roadNo == this.patchHere().roadNo - 1 || patchRight.roadNo == this.patchHere().roadNo + 1)) {
+				forward(1)
+				right(90)
+				forward(1)
+				left(90)
+				
+				if (abs(patchRight.getPxcor() - destinationX) == 1)
+					destinationX = patchRight.getPxcor()
+				if (abs(patchRight.getPycor() - destinationY) == 1)
+					destinationY = patchRight.getPycor()
 			}
 		}
 	}
 	
 	def dieIfAlreadyOnPlace() {
-		// TODO when changed road - need update destinations
 		if (getXcor() == this.destinationX && getYcor() == this.destinationY) {
 			die()
 		}
