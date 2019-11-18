@@ -21,11 +21,15 @@ class UserObserver extends ReLogoObserver{
 	int howManyCrossingWithLights = 1
 	int howManyCrossingCircles = 3
 	int lightTimerTicks = 10
+	int zebraMoveTimerTicks = 3
 	boolean usePedestrians = true
 	HashSet<UserPatch> patchesCrossing = new HashSet<>()
 	HashSet<Crossing> crossings = new HashSet<>()
+	HashSet<ZebraCrossing> zebraCrossings = new HashSet<>()
 	HashSet<Integer> notAllowedX = new HashSet<>()
 	HashSet<Integer> notAllowedY = new HashSet<>()
+	
+	// if (RunEnvironment.getInstance().getCurrentSchedule().getTickCount() % 7 == 0) {
 	
 	@Setup
 	def setup(){
@@ -43,6 +47,28 @@ class UserObserver extends ReLogoObserver{
 		
 	@Go
 	def go(){
+		// Pedestrians move
+		if (usePedestrians) {
+			for(ZebraCrossing zebra in zebraCrossings) {
+				// TODO better random
+				if (Math.random() >= 0.9) {
+					zebra.timer = zebraMoveTimerTicks + 1
+				}
+				
+				// Time tick
+				zebra.timer--
+				
+				// If -1 we will set zero
+				if (zebra.timer < 0) zebra.timer = 0
+				
+				// If timer > 0, we should set restriction
+				boolean blocked = zebra.timer > 0
+				for (UserPatch patch in zebra.patches) {
+					patch.pedestianOnZebra = blocked
+				}
+			}
+		}
+		
 		if (patch(-6, -24).turtlesHere().size() < 1) {
 			createTurtles(1) { UserTurtle turtle ->
 				// TODO add turtles dynamically in different locations
@@ -66,14 +92,6 @@ class UserObserver extends ReLogoObserver{
 		
 		ask(turtles()) { UserTurtle turtle ->
 			turtle.go()
-		}
-		
-		if (RunEnvironment.getInstance().getCurrentSchedule().getTickCount() % 7 == 0) {
-			ask(patches()) { UserPatch patch ->
-				if (patch.patchType == PatchType.ZEBRA) {
-					patch.pedestianOnZebra = !patch.pedestianOnZebra
-				}
-			}
 		}
 	}
 	
@@ -99,11 +117,23 @@ class UserObserver extends ReLogoObserver{
 		for (int i = 0; i < 2 * roadsVertically; i++) {
 			if (allowedX.iterator().hasNext()) {
 				Integer xRef = allowedX.iterator().next()
+				ZebraCrossing crossing = null
 				
 				for (int y = getMinPycor(); y <= getMaxPycor(); y++) {
 					UserPatch p = patch(xRef, y)
 					if (p.patchType == PatchType.FOOTPATH || p.patchType == PatchType.ROAD_NORMAL || p.patchType == PatchType.ROAD_SPECIAL) {
 						markAsZebra(p)
+						// If previous not found crossing
+						if (!crossing) {
+							crossing = new ZebraCrossing()
+							zebraCrossings.add(crossing)
+						}
+						
+						// Add patch to zebra crossing reference
+						crossing.patches.add(p)
+					} else {
+						// Do not remember previous crossing when exit group
+						crossing = null
 					}
 				}
 				
@@ -120,11 +150,23 @@ class UserObserver extends ReLogoObserver{
 		for (int i = 0; i < 2 * roadsHorizontally; i++) {
 			if (allowedY.iterator().hasNext()) {
 				Integer yRef = allowedY.iterator().next()
+				ZebraCrossing crossing = null
 				
 				for (int x = getMinPxcor(); x <= getMaxPxcor(); x++) {
 					UserPatch p = patch(x, yRef)
 					if (p.patchType == PatchType.FOOTPATH || p.patchType == PatchType.ROAD_NORMAL || p.patchType == PatchType.ROAD_SPECIAL) {
 						markAsZebra(p)
+						// If previous not found crossing
+						if (!crossing) {
+							crossing = new ZebraCrossing()
+							zebraCrossings.add(crossing)
+						}
+						
+						// Add patch to zebra crossing reference
+						crossing.patches.add(p)
+					} else {
+						// Do not remember previous crossing when exit group
+						crossing = null
 					}
 				}
 				
@@ -137,6 +179,8 @@ class UserObserver extends ReLogoObserver{
 				break
 			}
 		}
+		
+		System.out.println(zebraCrossings.size())
 	}
 
 	def setRoadsOnMap() {
