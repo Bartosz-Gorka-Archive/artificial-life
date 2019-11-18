@@ -23,13 +23,19 @@ class UserObserver extends ReLogoObserver{
 	int lightTimerTicks = 10
 	int zebraMoveTimerTicks = 3
 	boolean usePedestrians = true
+	int busStartTicks = 10
+	int passengersToDeliverEveryTick = 100
 	
+	// Privates
+	private int ticksToStartBus = 0
+	private int passengersInBuses = 0
 	HashSet<UserPatch> patchesCrossing = new HashSet<>()
 	HashSet<Crossing> crossings = new HashSet<>()
 	HashSet<ZebraCrossing> zebraCrossings = new HashSet<>()
 	HashSet<Integer> notAllowedX = new HashSet<>()
 	HashSet<Integer> notAllowedY = new HashSet<>()
 	ArrayList<Location> startLocations = new ArrayList<>()
+	Random rnd = new Random()
 	
 	// if (RunEnvironment.getInstance().getCurrentSchedule().getTickCount() % 7 == 0) {
 	
@@ -81,40 +87,55 @@ class UserObserver extends ReLogoObserver{
 			}
 		}
 		
-		Collections.shuffle(startLocations)
-		Location l = startLocations.get(0)
+		// Tick buses generator
+		ticksToStartBus--
+		if (ticksToStartBus < 0)
+			ticksToStartBus = 0
 		
-		if (l.startLocationPatch.turtlesHere().isEmpty()) {
-			createUserTurtles(1) { UserTurtle turtle ->
-				turtle.setxy(l.startLocationPatch.getPxcor(), l.startLocationPatch.getPycor())
-				turtle.moveRule = l.moveRule
-				turtle.lightExtraRule = l.extraLightRule
-				turtle.destinationX = l.destinationLocationPatch.getPxcor()
-				turtle.destinationY = l.destinationLocationPatch.getPycor()
-				
-				switch (l.moveRule) {
-					case ActionRule.UP:
-						turtle.setHeading(0)
-						break
-						
-					case ActionRule.RIGHT:
-						turtle.setHeading(90)
-						break
-						
-					case ActionRule.DOWN:
-						turtle.setHeading(180)
-						break
+		// Calculate passengers in cars and buses
+		int passengersInCars = 0
+		for (int passengerNo = 0; passengerNo < passengersToDeliverEveryTick; passengerNo++) {
+			// TODO better random
+			if (Math.random() <= 0.1)
+				passengersInCars++
+			else
+				passengersInBuses++
+		}
+		
+		// Prepare new objects
+		ArrayList<Location> xloc = startLocations.collect()
+		Collections.shuffle(xloc)
+		
+		for (Location l in xloc) {
+			// Is empty?
+			if (l.startLocationPatch.turtlesHere().isEmpty()) {
+				if (l.startLocationPatch.patchType == PatchType.ROAD_NORMAL && passengersInCars >= 1) {
+					// 1, 2, 3, 4 or 5 passengers
+					int passengersCount = rnd.nextInt(4) + 1
 					
-					case ActionRule.LEFT:
-						turtle.setHeading(270)
-						break
-				}
-				
-				// TODO change it to passengers model
-				if (Math.random() >= 0.5) {
-					markAsBus(turtle)
-				} else {
-					markAsCar(turtle)
+					// If want add too much - allow only maximum current
+					if (passengersCount > passengersInCars) {
+						passengersCount = passengersInCars
+					}
+						
+					// Decrement used passengers
+					passengersInCars -= passengersCount
+					
+					UserTurtle car = createNewVehicle(l)
+					markAsCar(car)
+					car.passengersCount = passengersCount
+				} else if (l.startLocationPatch.patchType == PatchType.ROAD_SPECIAL || l.startLocationPatch.patchType == PatchType.ROAD_NORMAL) {
+					// Can we start new bus?
+					if (ticksToStartBus == 0 && passengersInBuses > 0) {
+						// Refresh ticks
+						ticksToStartBus = busStartTicks
+						
+						// Create bus
+						UserTurtle bus = createNewVehicle(l)
+						markAsBus(bus)
+						bus.passengersCount = passengersInBuses
+						passengersInBuses = 0
+					}
 				}
 			}
 		}
@@ -124,12 +145,44 @@ class UserObserver extends ReLogoObserver{
 		}
 	}
 	
+	def createNewVehicle(Location l) {
+		UserTurtle newTurtle
+		createUserTurtles(1) { UserTurtle turtle ->
+			newTurtle = turtle
+			turtle.setxy(l.startLocationPatch.getPxcor(), l.startLocationPatch.getPycor())
+			turtle.moveRule = l.moveRule
+			turtle.lightExtraRule = l.extraLightRule
+			turtle.destinationX = l.destinationLocationPatch.getPxcor()
+			turtle.destinationY = l.destinationLocationPatch.getPycor()
+		
+			switch (l.moveRule) {
+				case ActionRule.UP:
+					turtle.setHeading(0)
+					break
+					
+				case ActionRule.RIGHT:
+					turtle.setHeading(90)
+					break
+					
+				case ActionRule.DOWN:
+					turtle.setHeading(180)
+					break
+				
+				case ActionRule.LEFT:
+					turtle.setHeading(270)
+					break
+			}
+		}
+		
+		return newTurtle
+	}
+	
 	def findLocations() {
 		int y, previousRoadNo
 		
 		// Find UP locations
 		y = getMaxPycor()
-		previousRoadNo = 0
+		previousRoadNo = -1
 		for (int x = getMinPxcor(); x <= getMaxPxcor(); x++) {
 			UserPatch p = patch(x, y)
 			if (p.patchType == PatchType.ROAD_NORMAL || p.patchType == PatchType.ROAD_SPECIAL) {		
@@ -147,7 +200,7 @@ class UserObserver extends ReLogoObserver{
 		
 		// Find DOWN locations
 		y = getMinPycor()
-		previousRoadNo = 0
+		previousRoadNo = -1
 		for (int x = getMinPxcor(); x <= getMaxPxcor(); x++) {
 			UserPatch p = patch(x, y)
 			if (p.patchType == PatchType.ROAD_NORMAL || p.patchType == PatchType.ROAD_SPECIAL) {
@@ -165,7 +218,7 @@ class UserObserver extends ReLogoObserver{
 		
 		// Find LEFT locations
 		int x = getMinPxcor()
-		previousRoadNo = 0
+		previousRoadNo = -1
 		for (y = getMinPycor(); y <= getMaxPycor(); y++) {
 			UserPatch p = patch(x, y)
 			if (p.patchType == PatchType.ROAD_NORMAL || p.patchType == PatchType.ROAD_SPECIAL) {
@@ -183,7 +236,7 @@ class UserObserver extends ReLogoObserver{
 		
 		// Find RIGHT locations
 		x = getMaxPxcor()
-		previousRoadNo = 0
+		previousRoadNo = -1
 		for (y = getMinPycor(); y <= getMaxPycor(); y++) {
 			UserPatch p = patch(x, y)
 			if (p.patchType == PatchType.ROAD_NORMAL || p.patchType == PatchType.ROAD_SPECIAL) {
@@ -487,6 +540,13 @@ class UserObserver extends ReLogoObserver{
 	def markAsCar(UserTurtle turtle) {
 		turtle.vehicleType = VehicleType.CAR
 		turtle.setShape("car")
-		turtle.setColor(76.0d)
+		if (turtle.moveRule == ActionRule.UP)
+			turtle.setColor(76.0d)
+		else if (turtle.moveRule == ActionRule.DOWN)
+			turtle.setColor(66.0d)
+		else if (turtle.moveRule == ActionRule.LEFT)
+			turtle.setColor(56.0d)
+		else if (turtle.moveRule == ActionRule.RIGHT)
+			turtle.setColor(86.0d)
 	}
 }

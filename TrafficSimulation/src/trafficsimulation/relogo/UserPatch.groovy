@@ -14,5 +14,5 @@ class UserPatch extends ReLogoPatch{
 	public PatchType patchType
 	public Crossing crossing
 	public boolean pedestianOnZebra
-	public int roadNo = 0
+	public int roadNo = -1
 }

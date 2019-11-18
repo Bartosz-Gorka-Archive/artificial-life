@@ -81,7 +81,11 @@ class UserTurtle extends ReLogoTurtle{
 						}
 						break
 						
-					default:
+					case PatchType.ROAD_NORMAL:
+						forward(1)
+						break
+				
+					case PatchType.ROAD_SPECIAL:
 						forward(1)
 						break
 				}
@@ -115,6 +119,7 @@ class UserTurtle extends ReLogoTurtle{
 	
 	def dieIfAlreadyOnPlace() {
 		if (getXcor() == this.destinationX && getYcor() == this.destinationY) {
+			System.out.println("\tPassengers\t" + this.passengersCount)
 			die()
 		}
 	}
