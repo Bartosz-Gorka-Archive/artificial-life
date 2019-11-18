@@ -4,6 +4,7 @@ import static repast.simphony.relogo.Utility.*;
 import static repast.simphony.relogo.UtilityG.*;
 
 import repast.simphony.engine.environment.RunEnvironment
+import repast.simphony.parameter.Parameters
 import repast.simphony.relogo.Stop;
 import repast.simphony.relogo.Utility;
 import repast.simphony.relogo.UtilityG;
@@ -12,19 +13,21 @@ import repast.simphony.relogo.schedule.Setup;
 import trafficsimulation.ReLogoObserver;
 
 class UserObserver extends ReLogoObserver{
+	Parameters p = RunEnvironment.getInstance().getParameters();
+	
 	// How many patches we will ignore when build map
-	int notUsedPatches = 0
-	int howManyBusRoads = 1
-	int roadsHorizontally = 2
-	int roadsVertically = 2
-	int howWidthRoads = 2
-	int howManyCrossingWithLights = 4
-	int howManyCrossingCircles = 0
-	int lightTimerTicks = 10
-	int zebraMoveTimerTicks = 3
-	boolean usePedestrians = true
-	int busStartTicks = 10
-	int passengersToDeliverEveryTick = 100
+	int notUsedPatches = p.getValue("notUsedPatches")
+	int howManyBusRoads = p.getValue("howManyBusRoads")
+	int roadsHorizontally = p.getValue("roadsHorizontally")
+	int roadsVertically = p.getValue("roadsVertically")
+	int howWidthRoads = p.getValue("howWidthRoads")
+	int howManyCrossingWithLights = p.getValue("howManyCrossingWithLights")
+	int howManyCrossingCircles = p.getValue("howManyCrossingCircles") 
+	int lightTimerTicks = p.getValue("lightTimerTicks")
+	int zebraMoveTimerTicks = p.getValue("zebraMoveTimerTicks")
+	boolean usePedestrians = p.getValue("usePedestrians")
+	int busStartTicks = p.getValue("busStartTicks")
+	int passengersToDeliverEveryTick = p.getValue("passengersToDeliverEveryTick")
 	
 	// Privates
 	private int ticksToStartBus = 0

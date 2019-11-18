@@ -2,6 +2,9 @@ package trafficsimulation.relogo
 
 import static repast.simphony.relogo.Utility.*;
 import static repast.simphony.relogo.UtilityG.*;
+
+import repast.simphony.engine.environment.RunEnvironment
+import repast.simphony.parameter.Parameters
 import repast.simphony.relogo.Plural;
 import repast.simphony.relogo.Stop;
 import repast.simphony.relogo.Utility;
@@ -11,6 +14,8 @@ import repast.simphony.relogo.schedule.Setup;
 import trafficsimulation.ReLogoTurtle;
 
 class UserTurtle extends ReLogoTurtle{
+	Parameters p = RunEnvironment.getInstance().getParameters();
+	
 	public ActionRule moveRule
 	public ActionRule lightExtraRule
 	
@@ -19,7 +24,7 @@ class UserTurtle extends ReLogoTurtle{
 	int destinationX
 	int destinationY
 	
-	private int minLightTimer = 2
+	private int minLightTimer = p.getValue("minLightTimer")
 	
 	def go() {
 		if (!this.dieIfAlreadyOnPlace()) {
