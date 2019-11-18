@@ -11,7 +11,8 @@ import repast.simphony.relogo.schedule.Setup;
 import trafficsimulation.ReLogoPatch;
 
 class UserPatch extends ReLogoPatch{
-	def PatchType patchType
-	def Crossing crossing
-	def boolean pedestianOnZebra
+	public PatchType patchType
+	public Crossing crossing
+	public boolean pedestianOnZebra
+	public int roadNo
 }

@@ -215,66 +215,91 @@ public class ReLogoTurtle extends BaseTurtle{
 	}
 
 	/**
-	 * Returns the value from the getPatchType() method of the underlying patch.
+	 * Returns the value of the patchType variable of the underlying patch.
 	 * 
-	 * @return getPatchType() of type trafficsimulation.relogo.PatchType
+	 * @return patchType of type trafficsimulation.relogo.PatchType
 	 */
 	@ReLogoBuilderGeneratedFor("trafficsimulation.relogo.UserPatch")
 	public trafficsimulation.relogo.PatchType getPatchType(){
 		trafficsimulation.relogo.UserPatch p = (trafficsimulation.relogo.UserPatch)patchHere();
-		return p.getPatchType();
+		return p.patchType;
 	}
 
+
 	/**
-	 * Calls the setPatchType(trafficsimulation.relogo.PatchType) method of the underlying patch.
+	 * Sets the value of patchType of the underlying patch.
 	 * 
 	 */
 	@ReLogoBuilderGeneratedFor("trafficsimulation.relogo.UserPatch")
 	public void setPatchType(trafficsimulation.relogo.PatchType value){
 		trafficsimulation.relogo.UserPatch p = (trafficsimulation.relogo.UserPatch)patchHere();
-		p.setPatchType(value);
+		p.patchType = value;
 	}
 
 	/**
-	 * Returns the value from the getCrossing() method of the underlying patch.
+	 * Returns the value of the crossing variable of the underlying patch.
 	 * 
-	 * @return getCrossing() of type trafficsimulation.relogo.Crossing
+	 * @return crossing of type trafficsimulation.relogo.Crossing
 	 */
 	@ReLogoBuilderGeneratedFor("trafficsimulation.relogo.UserPatch")
 	public trafficsimulation.relogo.Crossing getCrossing(){
 		trafficsimulation.relogo.UserPatch p = (trafficsimulation.relogo.UserPatch)patchHere();
-		return p.getCrossing();
+		return p.crossing;
 	}
 
+
 	/**
-	 * Calls the setCrossing(trafficsimulation.relogo.Crossing) method of the underlying patch.
+	 * Sets the value of crossing of the underlying patch.
 	 * 
 	 */
 	@ReLogoBuilderGeneratedFor("trafficsimulation.relogo.UserPatch")
 	public void setCrossing(trafficsimulation.relogo.Crossing value){
 		trafficsimulation.relogo.UserPatch p = (trafficsimulation.relogo.UserPatch)patchHere();
-		p.setCrossing(value);
+		p.crossing = value;
 	}
 
 	/**
-	 * Returns the value from the isPedestianOnZebra() method of the underlying patch.
+	 * Returns the value of the pedestianOnZebra variable of the underlying patch.
 	 * 
-	 * @return isPedestianOnZebra() of type boolean
+	 * @return pedestianOnZebra of type boolean
 	 */
 	@ReLogoBuilderGeneratedFor("trafficsimulation.relogo.UserPatch")
-	public boolean isPedestianOnZebra(){
+	public boolean getPedestianOnZebra(){
 		trafficsimulation.relogo.UserPatch p = (trafficsimulation.relogo.UserPatch)patchHere();
-		return p.isPedestianOnZebra();
+		return p.pedestianOnZebra;
 	}
 
+
 	/**
-	 * Calls the setPedestianOnZebra(boolean) method of the underlying patch.
+	 * Sets the value of pedestianOnZebra of the underlying patch.
 	 * 
 	 */
 	@ReLogoBuilderGeneratedFor("trafficsimulation.relogo.UserPatch")
 	public void setPedestianOnZebra(boolean value){
 		trafficsimulation.relogo.UserPatch p = (trafficsimulation.relogo.UserPatch)patchHere();
-		p.setPedestianOnZebra(value);
+		p.pedestianOnZebra = value;
+	}
+
+	/**
+	 * Returns the value of the roadNo variable of the underlying patch.
+	 * 
+	 * @return roadNo of type int
+	 */
+	@ReLogoBuilderGeneratedFor("trafficsimulation.relogo.UserPatch")
+	public int getRoadNo(){
+		trafficsimulation.relogo.UserPatch p = (trafficsimulation.relogo.UserPatch)patchHere();
+		return p.roadNo;
+	}
+
+
+	/**
+	 * Sets the value of roadNo of the underlying patch.
+	 * 
+	 */
+	@ReLogoBuilderGeneratedFor("trafficsimulation.relogo.UserPatch")
+	public void setRoadNo(int value){
+		trafficsimulation.relogo.UserPatch p = (trafficsimulation.relogo.UserPatch)patchHere();
+		p.roadNo = value;
 	}
 
 	/**
