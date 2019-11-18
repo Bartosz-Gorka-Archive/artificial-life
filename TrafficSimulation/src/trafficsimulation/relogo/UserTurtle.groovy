@@ -23,10 +23,27 @@ class UserTurtle extends ReLogoTurtle{
 	
 	def go() {
 		if (!this.dieIfAlreadyOnPlace()) {
-			UserPatch patch = patchAt(0, 1)
+			UserPatch patch
+			switch (this.moveRule) {
+				case ActionRule.UP:
+					patch = patchAt(0, 1)
+					break
+					
+				case ActionRule.RIGHT:
+					patch = patchAt(1, 0)
+					break
+					
+				case ActionRule.DOWN:
+					patch = patchAt(0, -1)
+					break
+				
+				case ActionRule.LEFT:
+					patch = patchAt(-1, 0)
+					break
+			}
 			
 			// Empty?
-			if (patch.turtlesHere().size() < 1) {
+			if (patch.turtlesHere().isEmpty()) {
 				switch (patch.patchType) {
 					// If zebra crossing - can enter?
 					case PatchType.ZEBRA:
@@ -46,6 +63,7 @@ class UserTurtle extends ReLogoTurtle{
 								forward(1)
 							}
 						} else if(patch.crossing.crossType == CrossType.TRAFFIC_CIRCLE) {
+							// TODO maybe check left site?
 							forward(1)
 						}
 						break
@@ -59,6 +77,7 @@ class UserTurtle extends ReLogoTurtle{
 	}
 	
 	def dieIfAlreadyOnPlace() {
+		// TODO when changed road - need update destinations
 		if (getXcor() == this.destinationX && getYcor() == this.destinationY) {
 			die()
 		}

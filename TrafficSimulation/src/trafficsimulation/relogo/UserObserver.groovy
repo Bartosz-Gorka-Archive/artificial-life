@@ -23,11 +23,13 @@ class UserObserver extends ReLogoObserver{
 	int lightTimerTicks = 10
 	int zebraMoveTimerTicks = 3
 	boolean usePedestrians = true
+	
 	HashSet<UserPatch> patchesCrossing = new HashSet<>()
 	HashSet<Crossing> crossings = new HashSet<>()
 	HashSet<ZebraCrossing> zebraCrossings = new HashSet<>()
 	HashSet<Integer> notAllowedX = new HashSet<>()
 	HashSet<Integer> notAllowedY = new HashSet<>()
+	ArrayList<Location> startLocations = new ArrayList<>()
 	
 	// if (RunEnvironment.getInstance().getCurrentSchedule().getTickCount() % 7 == 0) {
 	
@@ -43,6 +45,9 @@ class UserObserver extends ReLogoObserver{
 		if (usePedestrians) {
 			drawZebraCrossing()
 		}
+		
+		// Find start and destination places
+		findLocations()
 	}
 		
 	@Go
@@ -76,13 +81,34 @@ class UserObserver extends ReLogoObserver{
 			}
 		}
 		
-		if (patch(-6, -24).turtlesHere().size() < 1) {
-			createTurtles(1) { UserTurtle turtle ->
-				// TODO add turtles dynamically in different locations
-				turtle.setxy(-6, -24)
+		Collections.shuffle(startLocations)
+		Location l = startLocations.get(0)
+		
+		if (l.startLocationPatch.turtlesHere().isEmpty()) {
+			createUserTurtles(1) { UserTurtle turtle ->
+				turtle.setxy(l.startLocationPatch.getPxcor(), l.startLocationPatch.getPycor())
+				turtle.moveRule = l.moveRule
+				turtle.lightExtraRule = l.extraLightRule
+				turtle.destinationX = l.destinationLocationPatch.getPxcor()
+				turtle.destinationY = l.destinationLocationPatch.getPycor()
 				
-				// TODO set angle
-				turtle.setHeading(0)
+				switch (l.moveRule) {
+					case ActionRule.UP:
+						turtle.setHeading(0)
+						break
+						
+					case ActionRule.RIGHT:
+						turtle.setHeading(90)
+						break
+						
+					case ActionRule.DOWN:
+						turtle.setHeading(180)
+						break
+					
+					case ActionRule.LEFT:
+						turtle.setHeading(270)
+						break
+				}
 				
 				// TODO change it to passengers model
 				if (Math.random() >= 0.5) {
@@ -90,19 +116,87 @@ class UserObserver extends ReLogoObserver{
 				} else {
 					markAsCar(turtle)
 				}
-				
-				// TODO dynamic
-				turtle.destinationX = -6
-				turtle.destinationY = 24
-				
-				// TODO change it
-				turtle.moveRule = ActionRule.UP
-				turtle.lightExtraRule = ActionRule.DOWN
 			}
 		}
 		
-		ask(turtles()) { UserTurtle turtle ->
+		ask(userTurtles()) { UserTurtle turtle ->
 			turtle.go()
+		}
+	}
+	
+	def findLocations() {
+		int y, previousRoadNo
+		
+		// Find UP locations
+		y = getMaxPycor()
+		previousRoadNo = 0
+		for (int x = getMinPxcor(); x <= getMaxPxcor(); x++) {
+			UserPatch p = patch(x, y)
+			if (p.patchType == PatchType.ROAD_NORMAL || p.patchType == PatchType.ROAD_SPECIAL) {		
+				if (p.roadNo > previousRoadNo) {
+					Location location = new Location()
+					location.destinationLocationPatch = patch(x, getMinPycor())
+					location.startLocationPatch = p
+					location.moveRule = ActionRule.DOWN
+					location.extraLightRule = ActionRule.UP
+					startLocations.add(location)
+				}				
+			}
+			previousRoadNo = p.roadNo
+		}
+		
+		// Find DOWN locations
+		y = getMinPycor()
+		previousRoadNo = 0
+		for (int x = getMinPxcor(); x <= getMaxPxcor(); x++) {
+			UserPatch p = patch(x, y)
+			if (p.patchType == PatchType.ROAD_NORMAL || p.patchType == PatchType.ROAD_SPECIAL) {
+				if (p.roadNo <= previousRoadNo) {
+					Location location = new Location()
+					location.destinationLocationPatch = patch(x, getMaxPycor())
+					location.startLocationPatch = p
+					location.moveRule = ActionRule.UP
+					location.extraLightRule = ActionRule.DOWN
+					startLocations.add(location)
+				}
+			}
+			previousRoadNo = p.roadNo
+		}
+		
+		// Find LEFT locations
+		int x = getMinPxcor()
+		previousRoadNo = 0
+		for (y = getMinPycor(); y <= getMaxPycor(); y++) {
+			UserPatch p = patch(x, y)
+			if (p.patchType == PatchType.ROAD_NORMAL || p.patchType == PatchType.ROAD_SPECIAL) {
+				if (p.roadNo > previousRoadNo) {
+					Location location = new Location()
+					location.destinationLocationPatch = patch(getMaxPxcor(), y)
+					location.startLocationPatch = p
+					location.moveRule = ActionRule.RIGHT
+					location.extraLightRule = ActionRule.LEFT
+					startLocations.add(location)
+				}
+			}
+			previousRoadNo = p.roadNo
+		}
+		
+		// Find RIGHT locations
+		x = getMaxPxcor()
+		previousRoadNo = 0
+		for (y = getMinPycor(); y <= getMaxPycor(); y++) {
+			UserPatch p = patch(x, y)
+			if (p.patchType == PatchType.ROAD_NORMAL || p.patchType == PatchType.ROAD_SPECIAL) {
+				if (p.roadNo >= previousRoadNo) {
+					Location location = new Location()
+					location.destinationLocationPatch = patch(getMinPxcor(), y)
+					location.startLocationPatch = p
+					location.moveRule = ActionRule.LEFT
+					location.extraLightRule = ActionRule.RIGHT
+					startLocations.add(location)
+				}
+			}
+			previousRoadNo = p.roadNo
 		}
 	}
 	
