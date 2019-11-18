@@ -11,10 +11,15 @@ import repast.simphony.relogo.schedule.Setup;
 import trafficsimulation.ReLogoTurtle;
 
 class UserTurtle extends ReLogoTurtle{
+	public ActionRule moveRule
+	public ActionRule lightExtraRule
+	
 	VehicleType vehicleType
 	int passengersCount
 	int destinationX
 	int destinationY
+	
+	private int minLightTimer = 2
 	
 	def go() {
 		if (!this.dieIfAlreadyOnPlace()) {
@@ -26,6 +31,21 @@ class UserTurtle extends ReLogoTurtle{
 					// If zebra crossing - can enter?
 					case PatchType.ZEBRA:
 						if (!patch.pedestianOnZebra) {
+							forward(1)
+						}
+						break
+						
+					// If crossing
+					case PatchType.CROSSING:
+						// If crossing with lights
+						if (patch.crossing.crossType == CrossType.TRAFFIC_WITH_LIGHTS) {
+							if ((patch.crossing.lights.rule == this.moveRule || patch.crossing.lights.rule == this.lightExtraRule) && patch.crossing.lights.timer >= this.minLightTimer) {
+								forward(1)
+							} else if (this.patchHere().patchType == PatchType.CROSSING) {
+								// Continue move if already on crossing
+								forward(1)
+							}
+						} else if(patch.crossing.crossType == CrossType.TRAFFIC_CIRCLE) {
 							forward(1)
 						}
 						break

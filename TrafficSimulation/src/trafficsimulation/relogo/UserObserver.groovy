@@ -18,8 +18,8 @@ class UserObserver extends ReLogoObserver{
 	int roadsHorizontally = 2
 	int roadsVertically = 2
 	int howWidthRoads = 2
-	int howManyCrossingWithLights = 1
-	int howManyCrossingCircles = 3
+	int howManyCrossingWithLights = 4
+	int howManyCrossingCircles = 0
 	int lightTimerTicks = 10
 	int zebraMoveTimerTicks = 3
 	boolean usePedestrians = true
@@ -69,30 +69,41 @@ class UserObserver extends ReLogoObserver{
 			}
 		}
 		
-//		if (patch(-6, -24).turtlesHere().size() < 1) {
-//			createTurtles(1) { UserTurtle turtle ->
-//				// TODO add turtles dynamically in different locations
-//				turtle.setxy(-6, -24)
-//				
-//				// TODO set angle
-//				turtle.setHeading(0)
-//				
-//				// TODO change it to passengers model
-//				if (Math.random() >= 0.5) {
-//					markAsBus(turtle)
-//				} else {
-//					markAsCar(turtle)
-//				}
-//				
-//				// TODO dynamic
-//				turtle.destinationX = -6
-//				turtle.destinationY = 24
-//			}
-//		}
-//		
-//		ask(turtles()) { UserTurtle turtle ->
-//			turtle.go()
-//		}
+		// Tick lights
+		for (Crossing crossing in crossings) {
+			if (crossing.crossType == CrossType.TRAFFIC_WITH_LIGHTS) {
+				crossing.lights.nextTick()
+			}
+		}
+		
+		if (patch(-6, -24).turtlesHere().size() < 1) {
+			createTurtles(1) { UserTurtle turtle ->
+				// TODO add turtles dynamically in different locations
+				turtle.setxy(-6, -24)
+				
+				// TODO set angle
+				turtle.setHeading(0)
+				
+				// TODO change it to passengers model
+				if (Math.random() >= 0.5) {
+					markAsBus(turtle)
+				} else {
+					markAsCar(turtle)
+				}
+				
+				// TODO dynamic
+				turtle.destinationX = -6
+				turtle.destinationY = 24
+				
+				// TODO change it
+				turtle.moveRule = ActionRule.UP
+				turtle.lightExtraRule = ActionRule.DOWN
+			}
+		}
+		
+		ask(turtles()) { UserTurtle turtle ->
+			turtle.go()
+		}
 	}
 	
 	def drawZebraCrossing() {

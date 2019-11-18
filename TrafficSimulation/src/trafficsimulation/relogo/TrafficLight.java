@@ -5,7 +5,7 @@ import trafficsimulation.relogo.ActionRule;
 
 public class TrafficLight {
 	public ActionRule rule;
-	private int timer;
+	public int timer;
 	private int ruleInt;
 	private int originalTimer;
 	
