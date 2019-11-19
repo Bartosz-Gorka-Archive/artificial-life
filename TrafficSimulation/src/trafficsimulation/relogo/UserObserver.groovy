@@ -356,6 +356,7 @@ class UserObserver extends ReLogoObserver{
 			for (int i = getMinPxcor(); i <= getMaxPxcor(); i++) {
 				for (int roadNo = 0; roadNo < howWidthRoads; roadNo++) {
 					patch(i, rowIndex + roadNo).roadNo = roadNo + 1
+					patch(i, rowIndex + roadNo).actionRule = ActionRule.LEFT
 					if (roadNo < howManyBusRoads) {
 						markAsBusRoad(patch(i, rowIndex + roadNo))
 					} else {
@@ -365,6 +366,7 @@ class UserObserver extends ReLogoObserver{
 				
 				for (int roadNo = 0; roadNo < howWidthRoads; roadNo++) {
 					patch(i, rowIndex + howWidthRoads + roadNo).roadNo = howWidthRoads - roadNo
+					patch(i, rowIndex + howWidthRoads + roadNo).actionRule = ActionRule.RIGHT
 					if (roadNo < (howWidthRoads - howManyBusRoads)) {
 						markAsNormalRoad(patch(i, rowIndex + howWidthRoads + roadNo))
 					} else {
@@ -391,6 +393,7 @@ class UserObserver extends ReLogoObserver{
 			for (int i = getMinPycor(); i <= getMaxPycor(); i++) {
 				for (int roadNo = 0; roadNo < howWidthRoads; roadNo++) {
 					patch(rowIndex + roadNo, i).roadNo = roadNo + 1
+					patch(rowIndex + roadNo, i).actionRule = ActionRule.DOWN
 					
 					// If already set patch type - we have crossing now
 					if (patch(rowIndex + roadNo, i).patchType) {
@@ -407,6 +410,7 @@ class UserObserver extends ReLogoObserver{
 				
 				for (int roadNo = 0; roadNo < howWidthRoads; roadNo++) {
 					patch(rowIndex + howWidthRoads + roadNo, i).roadNo = howWidthRoads - roadNo
+					patch(rowIndex + howWidthRoads + roadNo, i).actionRule = ActionRule.UP
 					
 					// If already set patch type - we have crossing now
 					if (patch(rowIndex + howWidthRoads + roadNo, i).patchType) {
@@ -487,18 +491,6 @@ class UserObserver extends ReLogoObserver{
 				crossing.crossType = CrossType.TRAFFIC_CIRCLE
 			}
 			crossingNo++
-		}
-		
-		// TODO debug only
-		for (int y = getMinPycor(); y <= getMaxPycor(); y++) {
-			System.out.println("")
-			for (int x = getMinPxcor(); x <= getMaxPxcor(); x++) {
-				UserPatch p = patch(x, y)
-				if (p.patchType == PatchType.ROAD_NORMAL || p.patchType == PatchType.ROAD_SPECIAL)
-					System.out.print(p.roadNo + " ")
-				else
-					System.out.print("- ")
-			}
 		}
 	}
 	

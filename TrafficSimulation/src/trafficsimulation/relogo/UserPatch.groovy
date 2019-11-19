@@ -15,4 +15,5 @@ class UserPatch extends ReLogoPatch{
 	public Crossing crossing
 	public boolean pedestianOnZebra
 	public int roadNo = -1
+	public ActionRule actionRule
 }

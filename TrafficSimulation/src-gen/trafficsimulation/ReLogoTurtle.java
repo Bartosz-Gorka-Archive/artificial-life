@@ -303,6 +303,28 @@ public class ReLogoTurtle extends BaseTurtle{
 	}
 
 	/**
+	 * Returns the value of the actionRule variable of the underlying patch.
+	 * 
+	 * @return actionRule of type trafficsimulation.relogo.ActionRule
+	 */
+	@ReLogoBuilderGeneratedFor("trafficsimulation.relogo.UserPatch")
+	public trafficsimulation.relogo.ActionRule getActionRule(){
+		trafficsimulation.relogo.UserPatch p = (trafficsimulation.relogo.UserPatch)patchHere();
+		return p.actionRule;
+	}
+
+
+	/**
+	 * Sets the value of actionRule of the underlying patch.
+	 * 
+	 */
+	@ReLogoBuilderGeneratedFor("trafficsimulation.relogo.UserPatch")
+	public void setActionRule(trafficsimulation.relogo.ActionRule value){
+		trafficsimulation.relogo.UserPatch p = (trafficsimulation.relogo.UserPatch)patchHere();
+		p.actionRule = value;
+	}
+
+	/**
 	 * Makes a directed userLink from a turtle to the caller then executes a set of
 	 * commands on the created userLink.
 	 * 

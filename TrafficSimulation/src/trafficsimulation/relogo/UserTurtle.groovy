@@ -214,7 +214,7 @@ class UserTurtle extends ReLogoTurtle{
 				}
 			} else if ((patchLeft.patchType == PatchType.ROAD_NORMAL || (
 					patchLeft.patchType == PatchType.ROAD_SPECIAL && this.vehicleType == VehicleType.BUS)
-				) &&  patchLeft.turtlesHere().isEmpty() && (patchLeft.roadNo == this.patchHere().roadNo - 1 || patchLeft.roadNo == this.patchHere().roadNo + 1)) {
+				) &&  patchLeft.turtlesHere().isEmpty() && patchLeft.actionRule == this.moveRule && (patchLeft.roadNo == this.patchHere().roadNo - 1 || patchLeft.roadNo == this.patchHere().roadNo + 1)) {
 				forward(1)
 				left(90)
 				forward(1)
@@ -226,7 +226,7 @@ class UserTurtle extends ReLogoTurtle{
 					
 			} else if ((patchRight.patchType == PatchType.ROAD_NORMAL || (
 					patchRight.patchType == PatchType.ROAD_SPECIAL && this.vehicleType == VehicleType.BUS)
-				) &&  patchRight.turtlesHere().isEmpty() && (patchRight.roadNo == this.patchHere().roadNo - 1 || patchRight.roadNo == this.patchHere().roadNo + 1)) {
+				) &&  patchRight.turtlesHere().isEmpty() && patchRight.actionRule == this.moveRule && (patchRight.roadNo == this.patchHere().roadNo - 1 || patchRight.roadNo == this.patchHere().roadNo + 1)) {
 				forward(1)
 				right(90)
 				forward(1)
