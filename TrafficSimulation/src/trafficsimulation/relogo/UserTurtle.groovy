@@ -103,14 +103,9 @@ class UserTurtle extends ReLogoTurtle{
 								}
 							}
 							
-//							// One patch next to crossing
-//							if (!p.turtlesHere().isEmpty()) {
-//								carsBefore += 1000
-//							}
-							
 							// We expect `carsBefore` empty spaces before
 							int empty = 0
-							for (int i = 0; i < carsBefore; i++) {
+							for (int i = 0; i <= carsBefore; i++) {
 								if (p.patchType == PatchType.ROAD_SPECIAL || p.patchType == PatchType.ROAD_NORMAL) {
 									if (p.turtlesHere().isEmpty()) {
 										empty++
@@ -138,15 +133,74 @@ class UserTurtle extends ReLogoTurtle{
 								}
 							}
 							
-							if (canEnter && (patchUp.crossing.lights.rule == this.moveRule || patchUp.crossing.lights.rule == this.lightExtraRule) && patchUp.crossing.lights.timer > carsBefore && empty >= carsBefore) {
+							if (canEnter && (patchUp.crossing.lights.rule == this.moveRule || patchUp.crossing.lights.rule == this.lightExtraRule) && patchUp.crossing.lights.timer > carsBefore && empty > carsBefore) {
 								forward(1)
-							} else if (this.patchHere().patchType == PatchType.CROSSING) {
-								// Continue move if already on crossing
-								// forward(1)
 							}
 						} else if(patchUp.crossing.crossType == CrossType.TRAFFIC_CIRCLE) {
-							// TODO check it and fix deadlocks
-							forward(1)
+							int carsBefore = 0
+							boolean canEnter = true
+							
+							UserPatch p = patchUp
+							while (p.patchType == PatchType.CROSSING) {
+								if (!p.turtlesHere().isEmpty() ) {
+									carsBefore++
+									
+									if (p.turtlesHere().get(0).moveRule != this.moveRule)
+										canEnter = false
+								}
+								
+								switch (this.moveRule) {
+									case ActionRule.UP:
+										p = p.patchAt(0, 1)
+										break
+										
+									case ActionRule.RIGHT:
+										p = p.patchAt(1, 0)
+										break
+										
+									case ActionRule.DOWN:
+										p = p.patchAt(0, -1)
+										break
+									
+									case ActionRule.LEFT:
+										p = p.patchAt(-1, 0)
+										break
+								}
+							}
+							
+							// We expect `carsBefore` empty spaces before
+							int empty = 0
+							for (int i = 0; i <= carsBefore; i++) {
+								if (p.patchType == PatchType.ROAD_SPECIAL || p.patchType == PatchType.ROAD_NORMAL) {
+									if (p.turtlesHere().isEmpty()) {
+										empty++
+									}
+									
+									switch (this.moveRule) {
+										case ActionRule.UP:
+											p = p.patchAt(0, 1)
+											break
+											
+										case ActionRule.RIGHT:
+											p = p.patchAt(1, 0)
+											break
+											
+										case ActionRule.DOWN:
+											p = p.patchAt(0, -1)
+											break
+										
+										case ActionRule.LEFT:
+											p = p.patchAt(-1, 0)
+											break
+									}
+								} else {
+									break
+								}
+							}
+							
+							if (canEnter && empty > carsBefore) {
+								forward(1)
+							}
 						}
 						break
 						
