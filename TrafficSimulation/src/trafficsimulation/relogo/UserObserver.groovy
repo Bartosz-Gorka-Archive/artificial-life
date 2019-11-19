@@ -14,9 +14,10 @@ import trafficsimulation.ReLogoObserver;
 
 class UserObserver extends ReLogoObserver{
 	Parameters p = RunEnvironment.getInstance().getParameters();
+	Object pg = RunEnvironment.getInstance().endAt(500);
 	
-	// How many patches we will ignore when build map
-	int notUsedPatches = p.getValue("notUsedPatches")
+	int notUsedPatches = p.getValue("notUsedPatches") // TODO can be removed
+	
 	int howManyBusRoads = p.getValue("howManyBusRoads")
 	int roadsHorizontally = p.getValue("roadsHorizontally")
 	int roadsVertically = p.getValue("roadsVertically")
@@ -32,6 +33,10 @@ class UserObserver extends ReLogoObserver{
 	// Privates
 	private int ticksToStartBus = 0
 	private int passengersInBuses = 0
+	private int transferedPassengersBuses = 0
+	private int transferedPassengersCars = 0
+	private int blockedCars = 0
+	private int blockedBuses = 0
 	HashSet<UserPatch> patchesCrossing = new HashSet<>()
 	HashSet<Crossing> crossings = new HashSet<>()
 	HashSet<ZebraCrossing> zebraCrossings = new HashSet<>()
@@ -40,7 +45,72 @@ class UserObserver extends ReLogoObserver{
 	ArrayList<Location> startLocations = new ArrayList<>()
 	Random rnd = new Random()
 	
-	// if (RunEnvironment.getInstance().getCurrentSchedule().getTickCount() % 7 == 0) {
+	def countBlockedCars() {
+		return blockedCars
+	}
+	
+	def countBlockedBuses() {
+		return blockedBuses
+	}
+	
+	def carCount() {
+		int cars = 0
+		for(UserTurtle t in userTurtles()) {
+			if (t.vehicleType == VehicleType.CAR) cars++
+		}
+		
+		return cars
+	}
+	
+	def busCount() {
+		int buses = 0
+		for(UserTurtle t in userTurtles()) {
+			if (t.vehicleType == VehicleType.BUS) buses++
+		}
+		
+		return buses
+	}
+	
+	def blockedZebraCrossings() {
+		int blocked = 0
+		for (ZebraCrossing c in zebraCrossings) {
+			if (c.timer > 0) blocked++
+		}
+		
+		return blocked
+	}
+	
+	def percentageBlockedZebraCrossings() {
+		return blockedZebraCrossings() / zebraCrossings.size()
+	}
+	
+	def transferedPassengersCars() {
+		return transferedPassengersCars
+	}
+	
+	def transferedPassengersBuses() {
+		return transferedPassengersBuses
+	}
+	
+	def passengersWaitingCars() {
+		int passengers = 0
+		for(UserTurtle t in userTurtles()) {
+			if (t.vehicleType == VehicleType.CAR)
+				passengers += t.passengersCount
+		}
+		
+		return passengers
+	}
+	
+	def passengersWaitingBuses() {
+		int passengers = 0
+		for(UserTurtle t in userTurtles()) {
+			if (t.vehicleType == VehicleType.BUS)
+				passengers += t.passengersCount
+		}
+		
+		return passengers
+	}
 	
 	@Setup
 	def setup(){
@@ -65,7 +135,7 @@ class UserObserver extends ReLogoObserver{
 		if (usePedestrians) {
 			for(ZebraCrossing zebra in zebraCrossings) {
 				// TODO better random
-				if (Math.random() >= 0.9) {
+				if (rnd.nextDouble() >= 0.9) {
 					zebra.timer = zebraMoveTimerTicks + 1
 				}
 				
@@ -99,7 +169,7 @@ class UserObserver extends ReLogoObserver{
 		int passengersInCars = 0
 		for (int passengerNo = 0; passengerNo < passengersToDeliverEveryTick; passengerNo++) {
 			// TODO better random
-			if (Math.random() <= 0.1)
+			if (rnd.nextDouble() <= 0.1)
 				passengersInCars++
 			else
 				passengersInBuses++
@@ -136,15 +206,30 @@ class UserObserver extends ReLogoObserver{
 						// Create bus
 						UserTurtle bus = createNewVehicle(l)
 						markAsBus(bus)
-						bus.passengersCount = passengersInBuses
+						bus.passengersCount = Math.min(passengersInBuses, 2 * passengersToDeliverEveryTick)
 						passengersInBuses = 0
 					}
 				}
 			}
 		}
 		
+		blockedCars = 0
+		blockedBuses = 0
 		ask(userTurtles()) { UserTurtle turtle ->
-			turtle.go()
+			if (turtle.vehicleType == VehicleType.CAR && turtle.isAlreadyOnPlace()) {
+				transferedPassengersCars += turtle.passengersCount
+				turtle.die()
+			} else if (turtle.vehicleType == VehicleType.BUS && turtle.isAlreadyOnPlace()) {
+				transferedPassengersBuses += turtle.passengersCount
+				turtle.die()
+			} else {
+				turtle.go()
+				
+				if (!turtle.alreadyMoved) {
+					if (turtle.vehicleType == VehicleType.CAR) blockedCars++
+					else if (turtle.vehicleType == VehicleType.BUS) blockedBuses++
+				}
+			}
 		}
 	}
 	
@@ -508,7 +593,7 @@ class UserObserver extends ReLogoObserver{
 	
 	def markAsEmptySpace(UserPatch patch) {
 		patch.patchType = PatchType.EMPTY_SPACE
-		patch.pcolor = green()
+		patch.pcolor = 66.2d
 	}
 	
 	def markAsFootPath(UserPatch patch) {

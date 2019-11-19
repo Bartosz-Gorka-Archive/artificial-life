@@ -7,7 +7,7 @@
 									
 		/>
 				<parameter name="howManyCrossingWithLights" displayName="howManyCrossingWithLights" type="int" 
-						defaultValue="4" 
+						defaultValue="0" 
 						isReadOnly="false" 
 						converter="repast.simphony.parameter.StringConverterFactory$IntConverter"
 									
@@ -31,13 +31,13 @@
 									
 		/>
 				<parameter name="passengersToDeliverEveryTick" displayName="passengersToDeliverEveryTick" type="int" 
-						defaultValue="100" 
+						defaultValue="50" 
 						isReadOnly="false" 
 						converter="repast.simphony.parameter.StringConverterFactory$IntConverter"
 									
 		/>
 				<parameter name="howManyBusRoads" displayName="howManyBusRoads" type="int" 
-						defaultValue="1" 
+						defaultValue="0" 
 						isReadOnly="false" 
 						converter="repast.simphony.parameter.StringConverterFactory$IntConverter"
 									
@@ -67,13 +67,13 @@
 									
 		/>
 				<parameter name="howManyCrossingCircles" displayName="howManyCrossingCircles" type="int" 
-						defaultValue="0" 
+						defaultValue="4" 
 						isReadOnly="false" 
 						converter="repast.simphony.parameter.StringConverterFactory$IntConverter"
 									
 		/>
 				<parameter name="howWidthRoads" displayName="howWidthRoads" type="int" 
-						defaultValue="2" 
+						defaultValue="1" 
 						isReadOnly="false" 
 						converter="repast.simphony.parameter.StringConverterFactory$IntConverter"
 									

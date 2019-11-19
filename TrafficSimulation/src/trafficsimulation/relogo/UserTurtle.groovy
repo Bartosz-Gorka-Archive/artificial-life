@@ -20,14 +20,16 @@ class UserTurtle extends ReLogoTurtle{
 	public ActionRule lightExtraRule
 	
 	VehicleType vehicleType
-	int passengersCount
+	int passengersCount = 0
 	int destinationX
 	int destinationY
+	boolean alreadyMoved = false
 	
 	private int minLightTimer = p.getValue("minLightTimer")
 	
 	def go() {
-		if (!this.dieIfAlreadyOnPlace()) {
+		if (!this.isAlreadyOnPlace()) {
+			alreadyMoved = false
 			UserPatch patchUp
 			UserPatch patchLeft
 			UserPatch patchRight
@@ -65,6 +67,7 @@ class UserTurtle extends ReLogoTurtle{
 					case PatchType.ZEBRA:
 						if (!patchUp.pedestianOnZebra) {
 							forward(1)
+							alreadyMoved = true
 						}
 						break
 						
@@ -135,6 +138,7 @@ class UserTurtle extends ReLogoTurtle{
 							
 							if (canEnter && (patchUp.crossing.lights.rule == this.moveRule || patchUp.crossing.lights.rule == this.lightExtraRule) && patchUp.crossing.lights.timer > carsBefore && empty > carsBefore) {
 								forward(1)
+								alreadyMoved = true
 							}
 						} else if(patchUp.crossing.crossType == CrossType.TRAFFIC_CIRCLE) {
 							int carsBefore = 0
@@ -200,16 +204,19 @@ class UserTurtle extends ReLogoTurtle{
 							
 							if (canEnter && empty > carsBefore) {
 								forward(1)
+								alreadyMoved = true
 							}
 						}
 						break
 						
 					case PatchType.ROAD_NORMAL:
 						forward(1)
+						alreadyMoved = true
 						break
 				
 					case PatchType.ROAD_SPECIAL:
 						forward(1)
+						alreadyMoved = true
 						break
 				}
 			} else if ((patchLeft.patchType == PatchType.ROAD_NORMAL || (
@@ -219,6 +226,8 @@ class UserTurtle extends ReLogoTurtle{
 				left(90)
 				forward(1)
 				right(90)
+				alreadyMoved = true
+				
 				if (abs(patchLeft.getPxcor() - destinationX) == 1)
 					destinationX = patchLeft.getPxcor()
 				if (abs(patchLeft.getPycor() - destinationY) == 1)
@@ -231,6 +240,7 @@ class UserTurtle extends ReLogoTurtle{
 				right(90)
 				forward(1)
 				left(90)
+				alreadyMoved = true
 				
 				if (abs(patchRight.getPxcor() - destinationX) == 1)
 					destinationX = patchRight.getPxcor()
@@ -240,10 +250,7 @@ class UserTurtle extends ReLogoTurtle{
 		}
 	}
 	
-	def dieIfAlreadyOnPlace() {
-		if (getXcor() == this.destinationX && getYcor() == this.destinationY) {
-			System.out.println("\tPassengers\t" + this.passengersCount)
-			die()
-		}
+	def isAlreadyOnPlace() {
+		return (getXcor() == this.destinationX && getYcor() == this.destinationY)
 	}
 }
