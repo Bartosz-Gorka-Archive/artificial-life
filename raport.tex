@@ -1,0 +1,76 @@
+\documentclass{article}
+\usepackage{polski}
+\usepackage[utf8]{inputenc}
+
+\title{Systemy wieloagentowe}
+\author{Kajetan Zimniak i Bartosz Górka }
+\date{Październik 2019}
+
+\usepackage{natbib}
+\usepackage{graphicx}
+
+\begin{document}
+
+\maketitle
+
+\section{Część pierwsza}
+\subsection{Opis modelowanego zjawiska / systemu}
+W ramach projektu zamodelowany został ruch drogowy w mieście. Głównym celem symulacji jest zbadanie wielkości utrudnień drogowych (korki) i szybkości przejazdu w zależności od rozwiązań infrastruktury drogowej.
+
+\subsection{Opis koncepcyjny modelu}
+Powszechnie wiadomo, że główna przyczyna powstania korków to zbyt duże nagromadzenie pojazdów na danym odcinku trasy, wykraczające ponad możliwości przepustowe odcinka. W przypadku zmiany pasa jazdy, wymuszenia zmniejszenia prędkości przez podróżującego tym pasem, możemy zaobserwować zjawisko ``fali uderzeniowej''.
+
+Ponadto istnieje szeroko promowane zjawisko rozwijania komunikacji miejskiej celem ograniczenia liczby pojazdów. Ma to wpływ zarówno na liczbę pojazdów w mieście, jak i powietrze (mniej pojazdów to potencjalnie mniej zanieczyszczeń). Aby było możliwe jej sprawne funkcjonowanie powstają specjalne ułatwienia drogowe jak tzw. bus-pasy, które jednocześnie mogą utrudniać ruch innym pojazdom.
+
+Wiemy także o negatywnym wpływie sygnalizacji drogowej na płynność przemieszczania się. Konieczność wyhamowania i ponownego ruszenia zakłóca płynność jazdy.
+
+\subsection{Założenia upraszczające}
+W symulacji nie zakładamy obecności pieszych poruszających się poza miejscami do tego przeznaczonymi. Piesi mimo obecności w symulacji nie będą przekraczać ``fizycznie'' przejść dla pieszych, lecz wymuszać na kierowcach zatrzymanie się przed takimi miejscami. Samo ich pojawianie się będzie odwzorowane jako rozkład prawdopodobieństwa.
+
+Dodatkowo przyjmujemy założenie o nie zatrzymywaniu się samochodów z przyczyn niezależnych od innych użytkowników ruchu (np. nie dopuszczamy sytuacji, w której pojazd zwolni, ponieważ pasażer chce przeczytać reklamę uliczną). Pojazdy i piesi poruszają się z maksymalnie dozwoloną prędkością.
+
+\subsection{Lista typów użytych agentów, wraz z ich opisem}
+\begin{itemize}
+    \item Chodnik, przejście dla pieszych, jezdnia, rondo, skrzyżowanie drogowe - \textit{patch} - wyznaczają możliwy obszar przemieszczania się pojazdów oraz pieszych.
+    \item Samochody - \textit{turtle} - mogą poruszać się tylko po zwykłych jezdniach.
+    \item Pojazdy uprzywilejowane (np. autobus) - \textit{turtle} - mogą poruszać się zarówno po bus-pasach i zwykłych jezdniach.
+    \item Piesi - \textit{turtle} - po pojawieniu się w okolicy samochodu powoduje jego obowiązkowe zatrzymanie, a tym samym zablokowanie ruchu. Mają pierwszeństwo przed pozostałymi pojazdami.
+\end{itemize}
+
+\subsection{Parametry modelu, wraz z ich opisem}
+\begin{itemize}
+    \item Liczba samochodów - oznacza sumaryczną liczbę pojazdów poruszających się po drodze, dla których bada się wielkość tworzących się korków.
+    \item Średnia prędkość samochodów - to miernik wielkości korków. Pozwala porównać szybkość przejazdu przez miasto w zależności od symulowanej sytuacji.
+    \item Średnie przyspieszenie - jak szybko pojazd może uzyskać swoją maksymalną prędkość 
+    \item Prawdopodobieństwo pojawienia się pieszego w okolicy przejścia dla pieszych
+    \item Ilość pasów ruchu - jak bardzo rozbudowana jest infrastruktura w mieście
+    \item Czas trwania światła zielonego bądź czerwonego - definiuje jak wiele pojazdów może przejechać przez skrzyżowanie (zakładając konieczność stopniowego przyspieszenia od prędkości zerowej)
+\end{itemize}
+
+\subsection{Hipotezy badawcze}
+\begin{itemize}
+    \item W ramach projektu badany będzie wpływ na wielkość ruchu drogowego (korków) zamiany skrzyżowań na ronda. Przed symulacją uważa się, że ronda są korzystniejsze dla kierowców.
+
+    \item Kolejną hipotezą jest zmniejszenie się korków poprzez budowanie naziemnych przejść dla pieszych, co izoluje ruch samochodowy od pieszego.
+
+    \item Trzecim elementem jest badanie sensowności wyznaczania tzw. bus-pasów w kontekście korków dla ogółu użytkowników dróg w mieście.
+\end{itemize}
+\end{document}
+
+------ Notatki po spotkaniu 29.10.2019 ----
+Rondo jako rzeczywiste:
+- krawdrat z ulic jednokierunkowych
+- mozna jechac dookola w jednym kierunku
+
+Można by zasugerować pasażerów
+- średnio x pasażerów na jeden tik symulacji
+- chcą oni przejechać skąd do jakiegoś celu
+- albo samochodem albo autobusem
+- zobaczyć jaka jest średnia prędkość przejazdu komunikacji miejskiej i samochodu - rozkład prawdopodobieństwa ich preferowania komunikacji.
+    - nie mają samochodu, mają samochód
+    - jak wpływa czas
+    - jak będzie dużo pasażerów chętnych to pewnie dużo autobusów będzie
+    - dynamiczna zmiana liczby pasażerów w zależności od czasu przejazdu (zobaczyć jaki będzie poziom).
+        - pasażerowie jako lista żółwi w liście (w pamięci autobusu)
+        - aktualizacja ich pozycji
+
