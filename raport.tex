@@ -1,6 +1,8 @@
 \documentclass{article}
 \usepackage{polski}
 \usepackage[utf8]{inputenc}
+\usepackage{graphicx,color,float}
+\usepackage{subcaption}
 
 \title{Systemy wieloagentowe}
 \author{Kajetan Zimniak i Bartosz Górka }
@@ -15,62 +17,193 @@
 
 \section{Część pierwsza}
 \subsection{Opis modelowanego zjawiska / systemu}
-W ramach projektu zamodelowany został ruch drogowy w mieście. Głównym celem symulacji jest zbadanie wielkości utrudnień drogowych (korki) i szybkości przejazdu w zależności od rozwiązań infrastruktury drogowej.
+\label{subsection:opis-modelu}
+W ramach projektu zamodelowany zostanie ruch drogowy w mieście. Głównym celem symulacji jest zbadanie wielkości utrudnień drogowych (korki) i szybkości przejazdu w zależności od rozwiązań infrastruktury drogowej.
 
 \subsection{Opis koncepcyjny modelu}
+\label{subsection:opis-koncepcyjny}
 Powszechnie wiadomo, że główna przyczyna powstania korków to zbyt duże nagromadzenie pojazdów na danym odcinku trasy, wykraczające ponad możliwości przepustowe odcinka. W przypadku zmiany pasa jazdy, wymuszenia zmniejszenia prędkości przez podróżującego tym pasem, możemy zaobserwować zjawisko ``fali uderzeniowej''.
 
-Ponadto istnieje szeroko promowane zjawisko rozwijania komunikacji miejskiej celem ograniczenia liczby pojazdów. Ma to wpływ zarówno na liczbę pojazdów w mieście, jak i powietrze (mniej pojazdów to potencjalnie mniej zanieczyszczeń). Aby było możliwe jej sprawne funkcjonowanie powstają specjalne ułatwienia drogowe jak tzw. bus-pasy, które jednocześnie mogą utrudniać ruch innym pojazdom.
+Ponadto istnieje szeroko promowane zjawisko rozwijania komunikacji miejskiej celem ograniczenia liczby pojazdów. Ma to wpływ zarówno na liczbę pojazdów w mieście, jak i na powietrze (mniej pojazdów to potencjalnie mniej zanieczyszczeń). Aby było możliwe sprawne funkcjonowanie komunikacji miejskiej, powstają specjalne ułatwienia drogowe jak tzw. bus-pasy, które jednocześnie mogą utrudniać ruch innym pojazdom.
 
-Wiemy także o negatywnym wpływie sygnalizacji drogowej na płynność przemieszczania się. Konieczność wyhamowania i ponownego ruszenia zakłóca płynność jazdy.
+Powszechnie uważa się za negatywny, wpływ sygnalizacji drogowej (sygnalizacji świetlnej) na płynność przemieszczania się. Konieczność wyhamowania i ponownego ruszenia zakłóca płynność jazdy. Dodatkowo wielokrotnie wymuszane jest zatrzymanie pojazdu z powodu czerwonego światła, mimo braku innych pojazdów na skrzyżowaniu.
+
+W naszej symulacji powstanie układ ulic modelowany przez ``patche'', po których dopuszczamy przemieszczanie się samochodów osobowych oraz autobusów. Ilość skrzyżowań, ich typ (skrzyżowanie z sygnalizacją świetlną bądź rondo) oraz liczba pasów drogowych będzie określana jako parametr uruchomienia symulacji.
 
 \subsection{Założenia upraszczające}
-W symulacji nie zakładamy obecności pieszych poruszających się poza miejscami do tego przeznaczonymi. Piesi mimo obecności w symulacji nie będą przekraczać ``fizycznie'' przejść dla pieszych, lecz wymuszać na kierowcach zatrzymanie się przed takimi miejscami. Samo ich pojawianie się będzie odwzorowane jako rozkład prawdopodobieństwa.
+\label{subsection:uproszczenia}
+Modelowanie dokładnych procesów zachodzących w mieście nie jest możliwe. W naszej symulacji nie zakładamy obecności pieszych poruszających się poza miejscami do tego przeznaczonymi. Piesi mimo obecności w symulacji nie będą przekraczać ``fizycznie'' przejść dla pieszych, lecz wymuszać na kierowcach zatrzymanie się przed takimi miejscami. Zakładamy możliwość wielokrotnego zablokowania wybranego przejścia dla pieszych (pieszy ma pierwszeństwo nad pojazdami, brak sygnalizacji świetlnej przy przejściach).
 
-Dodatkowo przyjmujemy założenie o nie zatrzymywaniu się samochodów z przyczyn niezależnych od innych użytkowników ruchu (np. nie dopuszczamy sytuacji, w której pojazd zwolni, ponieważ pasażer chce przeczytać reklamę uliczną). Pojazdy i piesi poruszają się z maksymalnie dozwoloną prędkością.
+Dodatkowo przyjmujemy założenie o nie zatrzymywaniu się samochodów z przyczyn niezależnych od innych użytkowników ruchu (np. nie dopuszczamy sytuacji, w której pojazd zwolni, ponieważ pasażer chce przeczytać reklamę uliczną).
+
+Jako uproszczenie wprowadzamy również pominięcie kwestii przyspieszenia i hamowania pojazdów. Prędkość, mimo pierwotnych planów nie będzie częścią analizy w ramach symulacji (symulacja już zakłada znaczne skomplikowanie, wprowadzenie dodatkowych niewiadomych może wpłynąć negatywnie na eksperyment).
 
 \subsection{Lista typów użytych agentów, wraz z ich opisem}
+\label{subsection:agenty}
 \begin{itemize}
-    \item Chodnik, przejście dla pieszych, jezdnia, rondo, skrzyżowanie drogowe - \textit{patch} - wyznaczają możliwy obszar przemieszczania się pojazdów oraz pieszych.
-    \item Samochody - \textit{turtle} - mogą poruszać się tylko po zwykłych jezdniach.
-    \item Pojazdy uprzywilejowane (np. autobus) - \textit{turtle} - mogą poruszać się zarówno po bus-pasach i zwykłych jezdniach.
-    \item Piesi - \textit{turtle} - po pojawieniu się w okolicy samochodu powoduje jego obowiązkowe zatrzymanie, a tym samym zablokowanie ruchu. Mają pierwszeństwo przed pozostałymi pojazdami.
+    \item Chodnik, przejście dla pieszych, jezdnia, rondo, skrzyżowanie z sygnalizacją świetlną - typ \textit{patch} - wyznaczają możliwy obszar przemieszczania się pojazdów oraz pieszych. Wjazd na skrzyżowanie z sygnalizacją świetlną jest możliwy wyłącznie kiedy zasada ruchu jest zgodna z naszą (zielone światło dla naszego agenta).
+    \item Samochody osobowe - typ \textit{turtle} - mogą poruszać się tylko po zwykłych jezdniach. Dopuszczalny jest wjazd na skrzyżowanie typu rondo oraz z sygnalizacją świetlną. Może znaleźć się na przejściu dla pieszych o ile nie zostało wcześniej zablokowane przez pieszych.
+    \item Autobus - typ \textit{turtle} - zachowanie podobne jak w przypadku samochodów osobowych. Różnica to możliwość poruszania się zarówno po bus-pasach, jak i zwykłych jezdniach.
+    \item Piesi - typ \textit{turtle} - po pojawieniu się w okolicy samochodu powoduje jego obowiązkowe zatrzymanie, a tym samym zablokowanie ruchu. Mają pierwszeństwo przed pozostałymi pojazdami. Nie są pokazywani na mapie.
 \end{itemize}
 
 \subsection{Parametry modelu, wraz z ich opisem}
+\label{subsection:parametry}
+W ramach symulacji użytkownik może sprecyzować następujące parametry:
 \begin{itemize}
-    \item Liczba samochodów - oznacza sumaryczną liczbę pojazdów poruszających się po drodze, dla których bada się wielkość tworzących się korków.
-    \item Średnia prędkość samochodów - to miernik wielkości korków. Pozwala porównać szybkość przejazdu przez miasto w zależności od symulowanej sytuacji.
-    \item Średnie przyspieszenie - jak szybko pojazd może uzyskać swoją maksymalną prędkość 
-    \item Prawdopodobieństwo pojawienia się pieszego w okolicy przejścia dla pieszych
-    \item Ilość pasów ruchu - jak bardzo rozbudowana jest infrastruktura w mieście
-    \item Czas trwania światła zielonego bądź czerwonego - definiuje jak wiele pojazdów może przejechać przez skrzyżowanie (zakładając konieczność stopniowego przyspieszenia od prędkości zerowej)
+    \item Liczba ulic poziomo oraz niezależnie od tego Liczba ulic pionowo - pozwala to na sprecyzowanie układu miasta. Symulacja dynamicznie tworzy siatkę miasta, próbując jednocześnie równomiernie je rozmieścić (oddalić od siebie na taką samą odległość)
+    \item Rozmiar świata jako cztery parametry (minX, maxX, minY, maxY) - może być wykorzystywane dla zwiększenia obszaru miasta i umożliwienia wstawienia większej liczby dróg
+    \item Liczba skrzyżowań z sygnalizacją świetlną oraz typu rondo - charakteryzują liczbę skrzyżowań danego typu. Suma obu parametrów powinna być zgodna z liczbą przecięć dróg (liczba ulic poziomo pomnożona przez liczbę ulic pionowo)
+    \item Czas trwania zielonego światła na skrzyżowaniu - dotyczy skrzyżowań z sygnalizacją świetlną, czas trwania w pojedynczym kroku (tick symulacji)
+    \item Liczba pasażerów do przewiezienia w każdym kroku symulacji - wpływa na liczbę generowanych samochodów osobowych, które mogą pomieścić od 1 do 5 osób. Dla każdego pasażera losowana jest preferencja przejazdu samochodem bądź autobusem komunikacji miejskiej.
+    \item Parametr co ile kroków symulacji możliwe jest wysłanie autobusu - autobus startuje jedynie kiedy upłynęła wskazana liczba ticków od poprzedniego przejazdu
+    \item Czas przejścia pieszego przez skrzyżowanie - długość w tickach, na jak długi czas będzie blokowane przejście (samochody nie mogą na nie wjechać)
+    \item Wskazanie czy używać przejść dla pieszych umieszczonych na jedni bądź izolować je (kładki nad jezdnią)
+    \item Liczba pasów ruchu w każdą stronę po których mogą przemieszczać się pojazdy
+    \item Liczba pasów ruchu wydzielona na specjalne zastosowanie przez autobusy (tzw. bus-pasy)
+\end{itemize}
+
+\subsection{Obserwacje w modelu}
+\label{subsection:obserwacje}
+Poza parametrami specyfikowanymi przez użytkownika, system podczas symulacji analizuje następuje charakterystyki:
+\begin{itemize}
+    \item Liczba samochodów osobowych aktualnie znajdujących się w symulacji
+    \item Liczba autobusów aktualnie znajdujących się w symulacji
+    \item Ilość zablokowanych przejść dla pieszych (pieszy znajduje się na przejściu)
+    \item Procent zablokowanych przejść dla pieszych (pieszy znajduje się na przejściu) w stosunku do liczby wszystkich przejść umieszczonych na mapie
+    \item Liczba pasażerów w pojazdach osobowych (poruszających się po mapie)
+    \item Liczba pasażerów w autobusach poruszających się po mapie
+    \item Liczba pasażerów ``dostarczona'' przez autobusy (ilu przejechało pomyślnie przez miasto wykorzystując autobusy)
+    \item Liczba pasażerów którzy przejechali pomyślnie przez miasto wykorzystując samochody osobowe
+    \item Liczba samochodów osobowych które nie mogą wykonać ruchu (również wjechać na skrzyżowanie)
+    \item Liczba autobusów które nie mogą wykonać ruchu (również wjechać na skrzyżowanie)
+    \item Łączna liczba samochodów osobowych które przejechały przez miasto od początku symulacji
+    \item Łączna liczba autobusów które przejechały przez miasto od początku symulacji
 \end{itemize}
 
 \subsection{Hipotezy badawcze}
+\label{subsection:hipotezy}
 \begin{itemize}
-    \item W ramach projektu badany będzie wpływ na wielkość ruchu drogowego (korków) zamiany skrzyżowań na ronda. Przed symulacją uważa się, że ronda są korzystniejsze dla kierowców.
+    \item W ramach projektu badany będzie wpływ na wielkość ruchu drogowego (korków) zamiany skrzyżowań na ronda. Przed symulacją uważa się, że ronda są korzystniejsze dla kierowców i przyspieszają ruch (zmniejszenia korków)
 
     \item Kolejną hipotezą jest zmniejszenie się korków poprzez budowanie naziemnych przejść dla pieszych, co izoluje ruch samochodowy od pieszego.
 
     \item Trzecim elementem jest badanie sensowności wyznaczania tzw. bus-pasów w kontekście korków dla ogółu użytkowników dróg w mieście.
 \end{itemize}
+
+\section{Część druga}
+\subsection{Opis implementacji modelu}
+Projekt został przygotowany z wykorzystaniem wielu dodatkowych obiektów, takich jak typy dróg itp. Zdecydowano się na wykorzystanie wyliczeń (enum) w celach porównań (na przykład kierunek przemieszczania się).
+
+Model pozwala wykorzystać dynamiczne parametry co jest wymagane przez obliczenia typu batch. Dodatkowo cała mapa jest generowana dynamicznie w zależności od rozmiaru oraz liczby dróg (szczegóły umieszczono w rozdziale \ref{subsection:parametry}). Program zarządza też zmianą świateł (przełączanie reguły ruchu) po upływie wskazanej liczby kroków symulacji.
+
+Pojazdy wjeżdżają do miasta gdy mogą zostać umieszczone na drodze (nie ma innego agenta na danym patchu) oraz jest wystarczająca liczba pasażerów.
+
+Najciekawszym fragmentem jest dynamiczne wyznaczanie umiejscowienia dróg o szerokości i typie zgodnym z parametrami modelu. W sposób dynamiczny również umieszczane są przejścia dla pieszych (jeżeli zdecydowano się na ich użycie). Również w ruchu pojazdów zastosowano rozszerzenie. Poza prostą jazdą jednym pasem, pojazdy starają się wyprzedzać co minimalizuje korki (szczególnie widoczne dla autobusów, które omijają korki wykorzystując bus-pasy).
+
+W analizie pominięto omówienie kodu. Starano się stworzyć go w możliwie jak najbardziej przejrzysty sposób, umieszczając dodatkowe komentarze jeżeli było to konieczne.
+
+\subsection{Wyniki eksperymentów}
+\label{subsection:wyniki-eksperymentow}
+
+\subsubsection{Hipoteza 1: Zamiana skrzyżowań z sygnalizacją świetlną na światła ma pozytywny wpływ na redukcję zatorów w mieście}
+Pierwsza z hipotez dotyczyła wpływu zamiany typu skrzyżowań z użycia sygnalizacji świetlnej na rondo. Spodziewaliśmy się, że taka zamiana da pozytywny wpływ, czyli pozwoli zredukować liczbę zatrzymanych pojazdów.
+
+\begin{table}[]
+    \centering
+    \caption{Tabela z parametrami świata dla Hipotezy 1}
+    \label{tabela:hipoteza1-swiat}
+    \resizebox{\textwidth}{!}{%
+    \begin{tabular}{|c|c|c|c|c|c|c|}
+    \hline
+    \textbf{\begin{tabular}[c]{@{}c@{}}Liczba skrzyżowań\\ z syg. świetlną\end{tabular}} & \textbf{\begin{tabular}[c]{@{}c@{}}Czas trwania\\ światła zielonego\end{tabular}} & \textbf{\begin{tabular}[c]{@{}c@{}}Liczba\\ rond\end{tabular}} & \textbf{\begin{tabular}[c]{@{}c@{}}Liczba pasażerów\\ co tick\end{tabular}} & \textbf{\begin{tabular}[c]{@{}c@{}}Liczba\\ bus-pasów\end{tabular}} & \textbf{\begin{tabular}[c]{@{}c@{}}Liczba dróg\\ poziomo\end{tabular}} & \textbf{\begin{tabular}[c]{@{}c@{}}Liczba dróg\\ pionowo\end{tabular}} \\ \hline
+    4 bądź 0 & 10 & 0 bądź 4 & 20 & 0 & 2 & 2 \\ \hline
+    \textbf{minY} & \textbf{minX} & \textbf{maxY} & \textbf{maxX} & \textbf{\begin{tabular}[c]{@{}c@{}}Liczba\\ pasów jezdni\end{tabular}} & \textbf{\begin{tabular}[c]{@{}c@{}}Czas blokady\\ przejścia\end{tabular}} & \textbf{\begin{tabular}[c]{@{}c@{}}Okres\\ autobusów\end{tabular}} \\ \hline
+    -24 & -24 & 24 & 24 & 2 & 3 & 5 \\ \hline
+    \end{tabular}%
+    }
+\end{table}
+
+Analiza oparta była o świat z parametrami wskazanymi w Tabeli \ref{tabela:hipoteza1-swiat}. Obliczenia zostały powtórzone 10-cio krotnie, a wyniki zaprezentowane w postaci wykresów. Wykorzystaliśmy dwie kombinacje. W jednej zastosowano 4 skrzyżowania z sygnalizacją świetlną, czas trwania światła zielonego 10 ticków. Natomiast w drugiej były to skrzyżowania typu rondo. W obu przypadkach pozwoliliśmy na ruch pieszych (przejścia dla pieszych aktywne).
+
+\subsubsection{Hipoteza 2: Izolacja ruchu pieszych od ruchu pojazdów zmniejsza utrudnienia w ruchu drogowym}
+Nasza druga hipoteza dotyczyła negatywnego wpływu ruchu pieszych na ruch pojazdów w mieście, a dokładniej wpływ na zwiększanie się korków. Pieszy przechodząc przez jezdnię blokuje ruch pojazdów. 
+
+\begin{table}[]
+    \centering
+    \caption{Tabela z parametrami świata dla Hipotezy 2}
+    \label{tabela:hipoteza2-swiat}
+    \resizebox{\textwidth}{!}{%
+    \begin{tabular}{|c|c|c|c|c|c|c|}
+    \hline
+    \textbf{\begin{tabular}[c]{@{}c@{}}Liczba skrzyżowań\\ z syg. świetlną\end{tabular}} & \textbf{\begin{tabular}[c]{@{}c@{}}Czas trwania\\ światła zielonego\end{tabular}} & \textbf{\begin{tabular}[c]{@{}c@{}}Liczba\\ rond\end{tabular}} & \textbf{\begin{tabular}[c]{@{}c@{}}Liczba pasażerów\\ co tick\end{tabular}} & \textbf{\begin{tabular}[c]{@{}c@{}}Liczba\\ bus-pasów\end{tabular}} & \textbf{\begin{tabular}[c]{@{}c@{}}Liczba dróg\\ poziomo\end{tabular}} & \textbf{\begin{tabular}[c]{@{}c@{}}Liczba dróg\\ pionowo\end{tabular}} \\ \hline
+    4 & 10 & 0 & 20 & 0 & 2 & 2 \\ \hline
+    \textbf{minY} & \textbf{minX} & \textbf{maxY} & \textbf{maxX} & \textbf{\begin{tabular}[c]{@{}c@{}}Liczba\\ pasów jezdni\end{tabular}} & \textbf{\begin{tabular}[c]{@{}c@{}}Czas blokady\\ przejścia\end{tabular}} & \textbf{\begin{tabular}[c]{@{}c@{}}Okres\\ autobusów\end{tabular}} \\ \hline
+    -24 & -24 & 24 & 24 & 2 & 3 & 5 \\ \hline
+    \end{tabular}%
+    }
+\end{table}
+
+Analiza oparta była o świat z parametrami wskazanymi w Tabeli \ref{tabela:hipoteza2-swiat}. Obliczenia zostały powtórzone 10-cio krotnie, a wyniki zaprezentowane w postaci wykresów.
+
+\begin{figure}[!h]
+\centering
+    \includegraphics[width=1.0\textwidth]{pics/Z_ProcentZablokowanychPrzejscDlaPieszych.png}
+    \caption{Procent zablokowanych przejść dla pieszych}
+    \label{fig:procent-zablokowanych-przejsc}
+\end{figure}
+
+Na wykresie \ref{fig:procent-zablokowanych-przejsc} zaprezentowano procent zablokowanych przejść w trakcie symulacji. Zawsze minimum jedno przejście jest zablokowane, a maksymalnie połowa z nich. Samochody mogą przemieszczać się przez miasto, lecz są spowalniane i co jakiś czas zatrzymywane przez pieszych.
+
+\begin{figure}[!h]
+\centering
+    \includegraphics[width=1.0\textwidth]{pics/Z_ProcentZablokowanychPojazdow.png}
+    \caption{Procent zablokowanych pojazdów dla mapy z przejściami}
+    \label{fig:procent-zablokowanych-pojazdow-z-przejsciami}
+\end{figure}
+
+\begin{figure}[!h]
+\centering
+    \includegraphics[width=1.0\textwidth]{pics/Bez_ProcentZablokowanychPojazdow.png}
+    \caption{Procent zablokowanych pojazdów dla mapy bez przejść}
+    \label{fig:procent-zablokowanych-pojazdow-bez}
+\end{figure}
+
+Kolejnym krokiem była analiza jak różni się charakterystyka procentu zatrzymanych pojazdów (osobno dla każdego typu) dla mapy z oraz bez przejść. Zostało to zaprezentowane odpowiednio na Rysunku \ref{fig:procent-zablokowanych-pojazdow-z-przejsciami} oraz Rysunku \ref{fig:procent-zablokowanych-pojazdow-bez}. Znaczące różnice występują w przedziale od 50 do 200 iteracji. Mimo trudności w porównaniu tych wykresów, możemy zaobserwować trend, że przez większość czasu autobusy były mniej blokowane.
+
+\begin{figure}[!h]
+\centering
+    \includegraphics[width=1.0\textwidth]{pics/Compare_LiczbaPojazdowNaMapie.png}
+    \caption{Porównanie liczności pojazdów dla obu typów miasta}
+    \label{fig:porownanie-licznosci-pojazdow}
+\end{figure}
+
+\begin{figure}[!h]
+\centering
+    \includegraphics[width=1.0\textwidth]{pics/Compare_ProcentZablokowanychPojazdow.png}
+    \caption{Porównanie procentowego zablokowania pojazdów dla obu typów miasta}
+    \label{fig:porownanie-zablokowane-pojazdy}
+\end{figure}
+
+Ostatnim krokiem w analizie tej hipotezy było porównanie ilości pojazdów (Rysunek \ref{fig:porownanie-licznosci-pojazdow}) na mapie oraz ich procentowy udział w tworzeniu zatorów (Rysunek \ref{fig:porownanie-zablokowane-pojazdy}). Możemy zaobserwować bardzo zbliżone do siebie liczności pojazdów w obu miastach, co jest szczególnie widoczne na początku symulacji.
+
+Dokonując analizy mogliśmy zaobserwować nieznaczną różnicę w procencie zablokowanych pojazdów, na korzyść miast bez przejść. Trudno jednakże wskazać, aby były to znaczące różnice. Stawiając hipotezę, spodziewaliśmy się różnicy rzędu od 10 do 20 punktów procentowych, co jednak nie występuje.
+Po przeprowadzeniu eksperymentów możemy stwierdzić, że nie udało się nam wykazać, aby izolowanie ruchu pieszych od ruchu drogowego miało znaczący wpływ na redukcję korków. Może być to spowodowane zbytnim uproszczeniem modelu ruchu polegającym na możliwości znalezienia się pojazdu na przejściu dla pieszych przed jego zablokowaniem (i braku konieczności opuszczenia go - piesi muszą manewrować między samochodami). Dodatkowo przyjęliśmy założenie o zliczaniu każdego zatrzymania pojazdu, również z powodu sygnalizacji świetlnej, a nie tylko i wyłącznie zatrzymań wynikających z pojawienia się pieszych bezpośrednio przed naszym pojazdem bądź pojazdami przed nami co wymusiło nasze zatrzymanie.
+
+\subsubsection{Hipoteza 3: A}
+TODO
+
+\subsection{Weryfikacja trafności modelu}
+\label{subsection:weryfikacja-trafnosci-modelu}
+TODO Hipoteza 1
+
+W przypadku Hipotezy 2: Izolacja ruchu pieszych od ruchu pojazdów zmniejsza utrudnienia w ruchu drogowym, nasza symulacja niestety okazuje się mijać z rzeczywistością. Budowa kładek dla pieszych nad jezdnią bądź przejść podziemnych, pozwala wyeliminować konieczność zwalniania i zatrzymywania się pojazdów, co nie było uwzględnione w implementacji. Izolacja ruchu pieszych ma również wpływ na poprawę bezpieczeństwa na drodze, a także pozwala przejść na drugą stronę przy dużym ruchu (przejście w bardzo ruchliwym miejscu, nawet w miejscu do tego wyznaczonym lecz bez sygnalizacji świetlnej nie należy do najszybszych - jako piesi musimy liczyć na przychylność kierowców, którzy zatrzymają się umożliwiając nam przejście).
+
+TODO Hipoteza 3
+
+\subsection{Wnioski, obserwacje}
+\label{subsection:wnioski}
+TODO
+
 \end{document}
-
------- Notatki po spotkaniu 29.10.2019 ----
-Rondo jako rzeczywiste:
-- krawdrat z ulic jednokierunkowych
-- mozna jechac dookola w jednym kierunku
-
-Można by zasugerować pasażerów
-- średnio x pasażerów na jeden tik symulacji
-- chcą oni przejechać skąd do jakiegoś celu
-- albo samochodem albo autobusem
-- zobaczyć jaka jest średnia prędkość przejazdu komunikacji miejskiej i samochodu - rozkład prawdopodobieństwa ich preferowania komunikacji.
-    - nie mają samochodu, mają samochód
-    - jak wpływa czas
-    - jak będzie dużo pasażerów chętnych to pewnie dużo autobusów będzie
-    - dynamiczna zmiana liczby pasażerów w zależności od czasu przejazdu (zobaczyć jaki będzie poziom).
-        - pasażerowie jako lista żółwi w liście (w pamięci autobusu)
-        - aktualizacja ich pozycji
 
