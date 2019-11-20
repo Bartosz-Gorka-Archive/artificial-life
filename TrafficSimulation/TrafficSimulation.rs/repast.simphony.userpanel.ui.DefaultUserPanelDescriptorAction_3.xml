@@ -1,4 +1,4 @@
-<repast.simphony.userpanel.ui.DefaultUserPanelDescriptor>
+<repast.simphony.userpanel.ui.DefaultUserPanelDescriptor simphonyVersion="2.7.0">
   <name>Custom Panel</name>
   <userPanelCreator>trafficsimulation.factories.ReLogoPanelCreator</userPanelCreator>
 </repast.simphony.userpanel.ui.DefaultUserPanelDescriptor>

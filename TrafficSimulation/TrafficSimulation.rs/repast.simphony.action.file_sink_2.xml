@@ -1,0 +1,23 @@
+<repast.simphony.data2.engine.FileSinkDescriptor simphonyVersion="2.7.0">
+  <name>FileSink</name>
+  <dataSet>DataSet</dataSet>
+  <delimiter>,</delimiter>
+  <format>TABULAR</format>
+  <sourceIds class="linked-hash-set">
+    <string>carCount</string>
+    <string>busCount</string>
+    <string>blockedZebraCrossings</string>
+    <string>countBlockedBuses</string>
+    <string>countBlockedCars</string>
+    <string>countTransferedBuses</string>
+    <string>countTransferedCars</string>
+    <string>passengersWaitingBuses</string>
+    <string>percentageBlockedZebraCrossings</string>
+    <string>passengersWaitingCars</string>
+    <string>transferedPassengersBuses</string>
+    <string>transferedPassengersCars</string>
+    <string>tick</string>
+  </sourceIds>
+  <fileName>ModelOutput.txt</fileName>
+  <addTimeStamp>true</addTimeStamp>
+</repast.simphony.data2.engine.FileSinkDescriptor>

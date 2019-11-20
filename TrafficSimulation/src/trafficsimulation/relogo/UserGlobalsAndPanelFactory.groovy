@@ -14,5 +14,7 @@ public class UserGlobalsAndPanelFactory extends AbstractReLogoGlobalsAndPanelFac
 		addMonitorWL("transferedPassengersCars", "Passengers delivered by cars", 1.0)
 		addMonitorWL("countBlockedCars", "Cars without move in previous tick", 1.0)
 		addMonitorWL("countBlockedBuses", "Buses without move in previous tick", 1.0)
+		addMonitorWL("countTransferedCars", "Cars moved across map", 1.0)
+		addMonitorWL("countTransferedBuses", "Buses moved across map", 1.0)
 	}
 }

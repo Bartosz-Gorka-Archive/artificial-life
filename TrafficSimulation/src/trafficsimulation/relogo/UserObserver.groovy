@@ -35,6 +35,8 @@ class UserObserver extends ReLogoObserver{
 	private int passengersInBuses = 0
 	private int transferedPassengersBuses = 0
 	private int transferedPassengersCars = 0
+	private int transferedBuses = 0
+	private int transferedCars = 0
 	private int blockedCars = 0
 	private int blockedBuses = 0
 	HashSet<UserPatch> patchesCrossing = new HashSet<>()
@@ -51,6 +53,14 @@ class UserObserver extends ReLogoObserver{
 	
 	def countBlockedBuses() {
 		return blockedBuses
+	}
+	
+	def countTransferedCars() {
+		return transferedCars
+	}
+	
+	def countTransferedBuses() {
+		return transferedBuses
 	}
 	
 	def carCount() {
@@ -81,6 +91,7 @@ class UserObserver extends ReLogoObserver{
 	}
 	
 	def percentageBlockedZebraCrossings() {
+		if (zebraCrossings.size() == 0) return 0
 		return blockedZebraCrossings() / zebraCrossings.size()
 	}
 	
@@ -182,7 +193,7 @@ class UserObserver extends ReLogoObserver{
 		for (Location l in xloc) {
 			// Is empty?
 			if (l.startLocationPatch.turtlesHere().isEmpty()) {
-				if (l.startLocationPatch.patchType == PatchType.ROAD_NORMAL && passengersInCars >= 1) {
+				if (l.startLocationPatch.patchType == PatchType.ROAD_NORMAL && passengersInCars >= 1 && ticksToStartBus >= 0 && passengersInBuses != 0) {
 					// 1, 2, 3, 4 or 5 passengers
 					int passengersCount = rnd.nextInt(4) + 1
 					
@@ -218,9 +229,11 @@ class UserObserver extends ReLogoObserver{
 		ask(userTurtles()) { UserTurtle turtle ->
 			if (turtle.vehicleType == VehicleType.CAR && turtle.isAlreadyOnPlace()) {
 				transferedPassengersCars += turtle.passengersCount
+				transferedCars++
 				turtle.die()
 			} else if (turtle.vehicleType == VehicleType.BUS && turtle.isAlreadyOnPlace()) {
 				transferedPassengersBuses += turtle.passengersCount
+				transferedBuses++
 				turtle.die()
 			} else {
 				turtle.go()
